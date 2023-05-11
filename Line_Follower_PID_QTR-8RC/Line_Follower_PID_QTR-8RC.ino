@@ -1,39 +1,33 @@
-//Started: 20/04/2023, updated: 03/05/2023
-//Author: Andrew Kennedy
-//Line Follower PID with the Pololu QTR-8RC sensor
+/****************************************************************
+* Started     : 20/Apr/2023
+* updated     : 11/May/2023
+* Author      : Andrew Kennedy
+* Description : Line Follower PID with the Pololu QTR-8RC sensor
+*               and serial communication for wireless control.                       
+****************************************************************/
+#include "Variables.h"
 
-//------------------PID Control-------------------
-float Kp=1;
+//------------------PID Control------------------- 
+float Kp=1.5;
 float Ki=0.002;
 float Kd=1.5;
 
-const byte maxSpeed = 255; 
-bool isLineBlack = true;
-byte calibTime = 3; //Calibration time in seconds
+byte maxSpeed = 255; 
+bool line = black;
 //-------------------------------------------------
-
-#include <QTRSensors.h>
-QTRSensors qtr;
-
-const uint8_t SensorCount = 8;
-uint16_t sensorValues[SensorCount];
-
-//H Bridge          [ENA~,IN1,IN2,IN3,IN4,ENB~]
-const byte hBridge[] = {10,A0,A1,A2,A3,11};
-
-float P=0, I=0, D=0, PID=0, error=0, lastError=0;
-int lSpeed, rSpeed;
 
 void setup() {
   Serial.begin(9600);
-
-  //Configure the sensors
-  qtr.setTypeRC();
-  qtr.setSensorPins((const uint8_t[]){2, 3, 4, 5, 6, 7, 8, 9}, SensorCount);
-  calibration();
+  delay(50);
+  sensorSetup();
+  calibration(3, false); //In seconds
+  PIDnow(5); //Print PID values
 }
 
 void loop() {
+  //Communicate with PC or wireless
+  Parser(serialConnection());
+
   //Read sensors
   error = map(readSensors(), 0, 7000, -1000, 1000);
 
