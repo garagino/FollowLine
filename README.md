@@ -1,6 +1,6 @@
 # FollowLine PID
 ## 💻 Sobre o projeto
-O nosso projeto engloba o uso de robôs seguidores de linha, cuja operação é embasada em um sofisticado sistema de controle PID. Essa abordagem garante a capacidade de realizar movimentos precisos e meticulosamente controlados. Além dessa notável característica, o robô é compatível com a tecnologia Bluetooth, o que possibilita o controle em tempo real dos valores do PID, proporcionando um ajuste instantâneo e eficaz.
+O projeto engloba o uso de robôs seguidores de linha, cuja operação é embasada em um sistema de controle PID. Essa abordagem garante a capacidade de realizar movimentos precisos e meticulosamente controlados. O robô  também é compatível com a tecnologia Bluetooth, o que possibilita o controle em tempo real dos valores do PID, proporcionando um ajuste instantâneo e eficaz.
 
 ## ⚙️ Hardware utilizado
 <ul>
@@ -21,7 +21,8 @@ https://www.robocore.net/tutoriais/instalacao-driver-da-blackboard
 https://www.robocore.net/tutoriais/vespa/
 
 ## 📈 Parâmetros
-### Os parâmetros a seguir são recebidos pela comunicação Bluetooth, na qual o robô desempenha o papel de destinatário:
+Os parâmetros a seguir são recebidos pela comunicação Bluetooth, na qual o robô desempenha o papel de destinatário:
+
 <table border="0" cellpadding="0" cellspacing="0" style="width:500px">
 	<tbody>
 		<tr>
@@ -58,11 +59,11 @@ https://www.robocore.net/tutoriais/vespa/
 Note que há parâmetros que devem possuir valores e outros parâmetros que não devem possuir valores.<br />
 Os valores citados acima pelos parâmetros individuais do PID e speed são exemplos e cabe ao usuário fazer o uso correto dos valores baseado nas necessidades individuais de cada robô.<br/>
 
-### Parâmetros enviados pelo robô a um dispositivo de controle que confirmam a entrega dos parâmetros:
-Ao mudar qualquer um dos parâmetros do PID, que, por padrão, cada valor está com a precisão de 5 casas decimais, o robô retorna o seguinte texto, baseado nos valores atuais da memória e incluindo o valor recentemente inserido: PID(P=2.00000, I=0.00200, D=5.00000).<br />
-Os parâmetros "run" e "stop" retornam: "Run robot.", "Stop robot.", respectivamente.<br />
-O parâmetro "line" retorna: "Following BLACK line." ou "Following WHITE line."<br />
-O parâmetro speed retorna o valor da velocidade máxima do robô <br />
+### Observações sobre os parâmetros
+- Ao mudar qualquer um dos parâmetros do PID, o robô retorna o seguinte texto, baseado nos valores atuais da memória e incluindo o valor recentemente inserido: PID(P=2.00000, I=0.00200, D=5.00000).<br />
+- Os parâmetros "run" e "stop" retornam: "Run robot.", "Stop robot.", respectivamente.<br />
+- O parâmetro "line" retorna: "Following BLACK line." ou "Following WHITE line."<br />
+- O parâmetro speed retorna o valor da velocidade máxima do robô <br />
 
 ## 😯 Como contribuir para o projeto
 
