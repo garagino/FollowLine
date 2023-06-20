@@ -6,6 +6,12 @@
 *               and serial communication for wireless control.                       
 ****************************************************************/
 #include "Variables.h"
+#include <SoftwareSerial.h>
+
+#define rxPin 10 //input pin
+#define txPin 11 //output pin
+
+SoftwareSerial BtSerial =  SoftwareSerial(rxPin, txPin);
 
 //------------------PID Control------------------- 
 float Kp=1.5;
@@ -17,7 +23,7 @@ bool line = black;
 //-------------------------------------------------
 
 void setup() {
-  Serial.begin(9600);
+  BtSerial.begin(9600);
   delay(50);
   sensorSetup();
   calibration(3, false); //In seconds

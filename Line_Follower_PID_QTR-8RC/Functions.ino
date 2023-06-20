@@ -28,10 +28,10 @@ int readSensors() {
 void printposition() {
   for (uint8_t i = 0; i < SensorCount; i++)
   {
-    Serial.print(sensorValues[i]);
-    Serial.print('\t');
+    BtSerial.print(sensorValues[i]);
+    BtSerial.print('\t');
   }
-  Serial.println(readSensors());
+  BtSerial.println(readSensors());
 }
 
 void calibration(byte calibTime, bool prnt) {
@@ -44,22 +44,22 @@ void calibration(byte calibTime, bool prnt) {
   digitalWrite(LED_BUILTIN, LOW); 
 
   if(prnt) {
-    Serial.println("Calibration values: ");
-    Serial.print("Minimum: ");
+    BtSerial.println("Calibration values: ");
+    BtSerial.print("Minimum: ");
     for (uint8_t i = 0; i < SensorCount; i++) // print the calibration minimum values
     {
-      Serial.print(qtr.calibrationOn.minimum[i]);
-      Serial.print(' ');
+      BtSerial.print(qtr.calibrationOn.minimum[i]);
+      BtSerial.print(' ');
     }
-    Serial.println();
+    BtSerial.println();
 
-    Serial.print("Maximum: ");
+    BtSerial.print("Maximum: ");
     for (uint8_t i = 0; i < SensorCount; i++)//Print the calibration maximum values 
     {
-      Serial.print(qtr.calibrationOn.maximum[i]);
-      Serial.print(' ');
+      BtSerial.print(qtr.calibrationOn.maximum[i]);
+      BtSerial.print(' ');
     }
-    Serial.println("\n");
+    BtSerial.println("\n");
   }
 }
 
@@ -71,15 +71,15 @@ void forwardOverride(int margin) {
   }
 
 void PIDnow(byte precision) {//-------------------------------------------------------------------
-  Serial.println("PID(" + String(Kp, precision) + ", " + String(Ki, precision) + ", " + String(Kd, precision) + ")");
+  BtSerial.println("PID(" + String(Kp, precision) + ", " + String(Ki, precision) + ", " + String(Kd, precision) + ")");
 }
 
 String serialConnection() {
   String out;
   static String s;
   static char c;
-  if(Serial.available()) {
-    c = Serial.read();
+  if(BtSerial.available()) {
+    c = BtSerial.read();
     if(c != '\n') s += c;
     else {
       out = s; 
@@ -112,7 +112,7 @@ void Parser(String s) {
     else if(x == "d") Kd = y.toFloat();
     else if(x == "speed") {
       maxSpeed = y.toInt();
-      Serial.println("maxSpeed: " + String(y));
+      BtSerial.println("maxSpeed: " + String(y));
       return;
       }
     else{printError(1); return;};
@@ -140,24 +140,24 @@ bool isNumber(String str) {
 
 void printError(byte n) {
   if(n == 1) {
-    Serial.println("Unknown Command.");
+    BtSerial.println("Unknown Command.");
   }
 
   if( n == 2) {
-    Serial.println("The value is not a number.");
+    BtSerial.println("The value is not a number.");
   }
 }
 
 void stopRobot() {
   speed(0,0);
-  Serial.println("Stop robot.");
+  BtSerial.println("Stop robot.");
 
   while(!robotRun) {
     Parser(serialConnection());
   }
 
   robotRun = false;
-  Serial.println("Run robot.");
+  BtSerial.println("Run robot.");
   speed(maxSpeed,maxSpeed);
   delay(100);
 }
