@@ -20,3 +20,18 @@ float P=0, I=0, D=0, PID=0, error=0, lastError=0;
 int lSpeed, rSpeed;
 
 bool robotRun = false;
+
+//Software serial setup
+#include <SoftwareSerial.h>
+
+#define rxPin 10 //input pin
+#define txPin 11 //output pin
+
+SoftwareSerial BtSerial =  SoftwareSerial(rxPin, txPin);
+
+//Marker sensor variables
+int markerCount = 5;
+const int markerSensorPin = 12; //we gotta change that
+bool markerDetected = false;
+unsigned long markerDetectionTime = 0;
+const unsigned long markerDelay = 100;

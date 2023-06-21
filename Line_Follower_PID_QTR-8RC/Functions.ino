@@ -149,6 +149,7 @@ void printError(byte n) {
 }
 
 void stopRobot() {
+  markerDetected = false;
   speed(0,0);
   BtSerial.println("Stop robot.");
 
@@ -160,4 +161,23 @@ void stopRobot() {
   BtSerial.println("Run robot.");
   speed(maxSpeed,maxSpeed);
   delay(100);
+}
+
+void markerChecker(){
+  bool currentMarkerStatus = digitalRead(markerSensorPin);
+  if (currentMarkerStatus == white && !markerDetected) {
+    if (millis() - markerDetectionTime >= markerDelay) {
+      markerDetected = true;
+      markerCount--;
+      BtSerial.println("Marker detected! Remaining markers: " + String(markerCount));
+      markerDetectionTime = millis(); // Update the marker detection time
+    }
+  }
+
+  // Check marker count
+  if (markerCount <= 0) {
+    // Stop the robot
+    stopRobot();
+    return; // Exit the loop
+  }
 }

@@ -6,12 +6,6 @@
 *               and serial communication for wireless control.                       
 ****************************************************************/
 #include "Variables.h"
-#include <SoftwareSerial.h>
-
-#define rxPin 10 //input pin
-#define txPin 11 //output pin
-
-SoftwareSerial BtSerial =  SoftwareSerial(rxPin, txPin);
 
 //------------------PID Control------------------- 
 float Kp=1.5;
@@ -27,6 +21,7 @@ void setup() {
   delay(50);
   sensorSetup();
   calibration(3, false); //In seconds
+  pinMode(markerSensorPin, INPUT);
   PIDnow(5); //Print PID values
 }
 
@@ -53,4 +48,7 @@ void loop() {
   forwardOverride(20);
 
   speed(lSpeed, rSpeed);
+  
+  //check the markers
+  markerChecker();
 }
