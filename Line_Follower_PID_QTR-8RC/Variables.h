@@ -30,7 +30,7 @@ bool robotRun = false;
 SoftwareSerial BtSerial =  SoftwareSerial(rxPin, txPin);
 
 //Marker sensor variables
-int markerCount = 5;
+int markerCount = 62;//maker total of actual track
 const int markerSensorPin = 12; //we gotta change that
 bool markerDetected = false;
 unsigned long markerDetectionTime = 0;
