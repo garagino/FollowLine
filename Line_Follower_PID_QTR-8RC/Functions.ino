@@ -165,7 +165,7 @@ void stopRobot() {
 
 void markerChecker(){
   bool currentMarkerStatus = digitalRead(markerSensorPin);
-  if (currentMarkerStatus == white && !markerDetected) {
+  if (currentMarkerStatus == 0 && !markerDetected) { // because the sensor is reading white as 0
     if (millis() - markerDetectionTime >= markerDelay) {
       markerDetected = true;
       markerCount--;
