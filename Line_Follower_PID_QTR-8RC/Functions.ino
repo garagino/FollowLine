@@ -1,3 +1,49 @@
+void WaitingTest(int starTimeTest){
+while(starTimeTest - currentTimeTest >= testDelay){
+currentTimeTest = millis();
+}
+}
+
+
+void test_motor_integrated() {
+  int directionL;
+  int directionR;
+  
+  directionL = 1;
+  directionR = 1;
+  speed(directionL,directionR);
+  WaitingTest(millis());
+
+  directionL = -1;
+  directionR = -1;
+  speed(directionL,directionR);
+  WaitingTest(millis());
+
+  directionL = 1;
+  directionR = -1;
+  speed(directionL,directionR);
+  WaitingTest(millis());
+
+  directionL = -1;
+  directionR = 1;
+  speed(directionL,directionR);
+  WaitingTest(millis());
+
+}
+
+
+void test_motor_single(int motorPinIn, int motorPinOut) {
+  
+  digitalWrite(motorPinIn, HIGH);
+  digitalWrite(motorPinOut, LOW);
+  WaitingTest(millis());
+
+  digitalWrite(motorPinIn, LOW);
+  digitalWrite(motorPinOut, HIGH);
+  WaitingTest(millis());
+}
+
+
 void speed(int mL, int mR) {
   analogWrite(hBridge[0], abs(mL));
   if(mL >=0) {
@@ -17,7 +63,8 @@ void speed(int mL, int mR) {
   }
 }
 
-int readSensors() {
+
+int testReadSensorsMain() {
   if(line == black) {
     return qtr.readLineBlack(sensorValues);
   }else{
@@ -25,159 +72,8 @@ int readSensors() {
   }
 }
 
-void printposition() {
-  for (uint8_t i = 0; i < SensorCount; i++)
-  {
-    BtSerial.print(sensorValues[i]);
-    BtSerial.print('\t');
-  }
-  BtSerial.println(readSensors());
+int testReadSensorsAux() {
+  return digitalRead(auxSensorPin);
 }
 
-void calibration(byte calibTime, bool prnt) {
-  pinMode(LED_BUILTIN, OUTPUT); 
-  digitalWrite(LED_BUILTIN, HIGH); //Turn on the builtin LED to indicate calibration
 
-  while(millis() <= calibTime*1000) { 
-    qtr.calibrate();
-  }
-  digitalWrite(LED_BUILTIN, LOW); 
-
-  if(prnt) {
-    BtSerial.println("Calibration values: ");
-    BtSerial.print("Minimum: ");
-    for (uint8_t i = 0; i < SensorCount; i++) // print the calibration minimum values
-    {
-      BtSerial.print(qtr.calibrationOn.minimum[i]);
-      BtSerial.print(' ');
-    }
-    BtSerial.println();
-
-    BtSerial.print("Maximum: ");
-    for (uint8_t i = 0; i < SensorCount; i++)//Print the calibration maximum values 
-    {
-      BtSerial.print(qtr.calibrationOn.maximum[i]);
-      BtSerial.print(' ');
-    }
-    BtSerial.println("\n");
-  }
-}
-
-void forwardOverride(int margin) {
-    if (error >= -margin and error <= margin) {
-      lSpeed = maxSpeed;
-      rSpeed = maxSpeed;
-    }
-  }
-
-void PIDnow(byte precision) {//-------------------------------------------------------------------
-  BtSerial.println("PID(" + String(Kp, precision) + ", " + String(Ki, precision) + ", " + String(Kd, precision) + ")");
-}
-
-String serialConnection() {
-  String out;
-  static String s;
-  static char c;
-  if(BtSerial.available()) {
-    c = BtSerial.read();
-    if(c != '\n') s += c;
-    else {
-      out = s; 
-      s = ""; 
-      return out;
-      }
-  }
-}
-
-void Parser(String s) {
-  if (s == "") return;
-  s.replace(" ", ""); //Remove all spaces
-  s.toLowerCase();
-  int a = s.indexOf("=");
-
-       if(s == "run")  robotRun = true;
-  else if(s == "stop") stopRobot();
-  else if(s == "line") line = !line;
-
-  else if(a != -1) {
-    //Separate things
-    String x = s.substring(0, a); //Variable
-    String y = s.substring(a+1, s.length()); //Value
-
-    if(!isNumber(y)) {printError(2); return;}
-
-    //Check variables
-         if(x == "p") Kp = y.toFloat();
-    else if(x == "i") Ki = y.toFloat();
-    else if(x == "d") Kd = y.toFloat();
-    else if(x == "speed") {
-      maxSpeed = y.toInt();
-      BtSerial.println("maxSpeed: " + String(y));
-      return;
-      }
-    else{printError(1); return;};
-    PIDnow(5);
-  }else{
-    printError(1);
-  }
-}
-
-bool isNumber(String str) {
-  bool hasDecimal = false;
-  for (int i = 0; i < str.length(); i++) {
-    char d = str.charAt(i);
-    if (d == '.') {
-      if (hasDecimal) {
-        return false; // multiple decimal points
-      }
-      hasDecimal = true;
-    } else if (!isdigit(d)) {
-      return false; // non-digit character
-    }
-  }
-  return true;
-}
-
-void printError(byte n) {
-  if(n == 1) {
-    BtSerial.println("Unknown Command.");
-  }
-
-  if( n == 2) {
-    BtSerial.println("The value is not a number.");
-  }
-}
-
-void stopRobot() {
-  markerDetected = false;
-  speed(0,0);
-  BtSerial.println("Stop robot.");
-
-  while(!robotRun) {
-    Parser(serialConnection());
-  }
-
-  robotRun = false;
-  BtSerial.println("Run robot.");
-  speed(maxSpeed,maxSpeed);
-  delay(100);
-}
-
-void markerChecker(){
-  bool currentMarkerStatus = digitalRead(markerSensorPin);
-  if (currentMarkerStatus == 0 && !markerDetected) { // because the sensor is reading white as 0
-    if (millis() - markerDetectionTime >= markerDelay) {
-      markerDetected = true;
-      markerCount--;
-      BtSerial.println("Marker detected! Remaining markers: " + String(markerCount));
-      markerDetectionTime = millis(); // Update the marker detection time
-    }
-  }
-
-  // Check marker count
-  if (markerCount <= 0) {
-    // Stop the robot
-    stopRobot();
-    return; // Exit the loop
-  }
-}
