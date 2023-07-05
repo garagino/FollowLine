@@ -15,7 +15,18 @@ void setup() {
   delay(50);
   sensorSetup();
   pinMode(auxSensorPin, INPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
+  // send data only when you receive data:
+  if (Serial.available() > 0) {
+    // read the incoming byte:
+    byte choice = Serial.read();
+
+    // say what you got:
+    Serial.print("I received: ");
+    Serial.println(choice, DEC);
+
+}
 }
