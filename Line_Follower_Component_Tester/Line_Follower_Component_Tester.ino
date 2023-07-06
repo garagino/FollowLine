@@ -8,25 +8,21 @@
 
 //------------------PID Control------------------- 
 
-bool line = white;
 //-------------------------------------------------
 
 void setup() {
   delay(50);
   sensorSetup();
   pinMode(auxSensorPin, INPUT);
-  Serial.begin(9600);
+  Serial.begin(9600);//arduino
+  //Serial.begin(115200);//vespa
 }
 
 void loop() {
-  // send data only when you receive data:
-  if (Serial.available() > 0) {
-    // read the incoming byte:
-    byte choice = Serial.read();
-
-    // say what you got:
-    Serial.print("I received: ");
-    Serial.println(choice, DEC);
-
-}
+  //testReadSensorsMain();
+  //testReadSensorsAux();
+  //test_motor_single(int motorPinIn, int motorPinOut);
+  //test_motor_integrated_arduino(1,1);
+  //test_motor_integrated_vespa();
+  //test_battery_vespa();
 }

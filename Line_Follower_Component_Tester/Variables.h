@@ -1,9 +1,9 @@
 #include <QTRSensors.h> //Library for the QTR-8A or the QTR-8RC
 QTRSensors qtr;
 
-//Define the values of lines in sensors:
-#define black 0
-#define white 1
+#include "RoboCore_Vespa.h"
+VespaMotors motors;
+VespaBattery vbat;
 
 //Test variables
 const unsigned long testDelay = 3000;
@@ -18,11 +18,15 @@ uint16_t sensorValues[SensorCount];
 void sensorSetup() {
   qtr.setTypeRC(); //                Sensor pins:
   qtr.setSensorPins((const uint8_t[]){2, 3, 4, 5, 6, 7, 8, 9}, SensorCount);
+
 }
 
-//Setup of the module that control the motors:
+//Setup of the module that control the motors in Arduino:
 //H Bridge          [ENA~,IN1,IN2,IN3,IN4,ENB~]
 const byte hBridge[] = {10,A0,A1,A2,A3,11};
 
+byte maxSpeed = 255; 
 
+//Setup of the module that control the motors in vespa:
+const int PAUSE_TIME = 2000;
 
