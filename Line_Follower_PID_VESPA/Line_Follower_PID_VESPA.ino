@@ -1,15 +1,17 @@
 /****************************************************************
-* Started     : 03/Jul/2023 - Updated: 05/Jul/2023
+* Started     : 03/Jul/2023 - Updated: 10/Jul/2023
 * Author      : Andrew Kennedy
 * Contributors: Cristina Matsunaga
-                Nicole Victory
-                Luiz Eduardo
+*               Nicole Victory
+*               Luiz Eduardo
+*               Erick Simões
 * Description : Line Follower PID with the microcontroller Vespa 
 *               from Robocore and the Pololu's QTR-8RC sensor                      
 ****************************************************************/
 
 #include<RoboCore_Vespa.h> //Library for the Vespa microcontroller
 VespaMotors motor;
+
 #include <QTRSensors.h> //Library for the QTR-8A or the QTR-8RC
 QTRSensors qtr;
 
@@ -20,12 +22,22 @@ int lSpeed, rSpeed;
 const uint8_t SensorCount = 8;
 uint16_t sensorValues[SensorCount];
 
-//------------------PID Control------------------- 
-float Kp=1;
-float Ki=0.0001;
-float Kd=1;
+//Stop sensor variable
+bool robotRun = false;
 
-byte maxSpeed = 150; 
+//Marker sensor variables
+int markerCount = 10;
+int markerCountNow = 0;
+const int markerSensorPin = 36;
+const int countFinishedLed = 15;
+bool findLine = false;
+
+//------------------PID Control------------------- 
+float Kp=0.25;
+float Ki=0.0001;
+float Kd=3;
+
+byte maxSpeed = 100; 
 bool isLineBlack = false;
 //-------------------------------------------------
 
@@ -33,10 +45,14 @@ void setup() {
   qtr.setTypeRC(); //For QTR-8RC      Sensor pins:
   qtr.setSensorPins((const uint8_t[]){17, 16, 18, 5, 23, 19, 22, 21}, SensorCount);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(100);
   pinMode(15, OUTPUT); 
   digitalWrite(15, HIGH); //Turn on the builtin LED to indicate calibration
+
+  pinMode(countFinishedLed , OUTPUT);
+  pinMode(markerSensorPin, INPUT);
+  digitalWrite(countFinishedLed, LOW);
 
   for (uint16_t i = 0; i < 160; i++){//4 seconds
     qtr.calibrate();
@@ -56,6 +72,11 @@ void setup() {
   Serial.println();
   digitalWrite(15, LOW); // Turn off Arduino's LED to indicate the end of the calibration
   delay(1000);
+
+  //marker setup 
+  pinMode(countFinishedLed , OUTPUT);
+  pinMode(markerSensorPin, INPUT);
+  digitalWrite(countFinishedLed, LOW);
 }
 
 void loop() {
@@ -78,6 +99,9 @@ void loop() {
   forwardOverride(20);
 
   motor.turn(lSpeed, rSpeed);
+  
+  //check the markers
+  markerChecker();
 }
 
 int readSensors() {
@@ -91,5 +115,21 @@ int readSensors() {
 void forwardOverride(int margin) {
   if (error >= -margin and error <= margin) {
     motor.turn(maxSpeed, maxSpeed);
+  }
+}
+
+void markerChecker(){
+  if(analogRead(markerSensorPin) < 2000 && findLine == false) {
+    findLine = true;
+  }
+
+  if(analogRead(markerSensorPin) >= 2000 && findLine == true) {
+    findLine = false;
+    markerCountNow++;
+  }
+  
+  if(markerCountNow >= markerCount) {
+   motor.stop();
+   digitalWrite(countFinishedLed, HIGH);
   }
 }
