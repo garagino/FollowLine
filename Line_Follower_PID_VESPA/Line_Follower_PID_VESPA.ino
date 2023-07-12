@@ -1,22 +1,17 @@
 /****************************************************************
-* Started     : 03/Jul/2023 - Updated: 10/Jul/2023
-* Author      : Andrew Kennedy
-* Contributors: Cristina Matsunaga
-*               Nicole Victory
-*               Luiz Eduardo
-*               Erick Simões
-* Description : Line Follower PID with the microcontroller Vespa 
-*               from Robocore and the Pololu's QTR-8RC sensor                      
+* Folow Line
+* CESAR School
+* 
+* Line Follower PID with the microcontroller Vespa 
+* from RoboCore and the Pololu's QTR-8RC sensor
 ****************************************************************/
 
 #include<RoboCore_Vespa.h> //Library for the Vespa microcontroller
-VespaMotors motor;
-
 #include <QTRSensors.h> //Library for the QTR-8A or the QTR-8RC
+
+VespaMotors motor;
 QTRSensors qtr;
 
-float P=0, I=0, D=0, PID=0, error=0, lastError=0;
-int lSpeed, rSpeed;
 
 //Setup of the module of sensors:
 const uint8_t SensorCount = 8;
@@ -33,11 +28,15 @@ const int countFinishedLed = 15;
 bool findLine = false;
 
 //------------------PID Control------------------- 
+float P=0, I=0, D=0, PID=0, error=0, lastError=0;
+
 float Kp=0.25;
 float Ki=0.0001;
 float Kd=3;
 
-byte maxSpeed = 100; 
+byte maxSpeed = 100;
+int lSpeed, rSpeed;
+
 bool isLineBlack = false;
 //-------------------------------------------------
 
@@ -47,14 +46,15 @@ void setup() {
 
   Serial.begin(115200);
   delay(100);
-  pinMode(15, OUTPUT); 
+  pinMode(15, OUTPUT);
   digitalWrite(15, HIGH); //Turn on the builtin LED to indicate calibration
 
   pinMode(countFinishedLed , OUTPUT);
   pinMode(markerSensorPin, INPUT);
   digitalWrite(countFinishedLed, LOW);
 
-  for (uint16_t i = 0; i < 160; i++){//4 seconds
+  for (uint16_t i = 0; i < 160; i++){ //4 seconds
+  // TODO: Implements calibration until button pressed
     qtr.calibrate();
   }
 
@@ -70,10 +70,11 @@ void setup() {
     Serial.print(' ');
   }
   Serial.println();
+  
   digitalWrite(15, LOW); // Turn off Arduino's LED to indicate the end of the calibration
   delay(1000);
 
-  //marker setup 
+  //marker setup
   pinMode(countFinishedLed , OUTPUT);
   pinMode(markerSensorPin, INPUT);
   digitalWrite(countFinishedLed, LOW);
