@@ -12,7 +12,6 @@
 VespaMotors motor;
 QTRSensors qtr;
 
-
 //Setup of the module of sensors:
 const uint8_t SensorCount = 8;
 uint16_t sensorValues[SensorCount];
@@ -48,10 +47,6 @@ void setup() {
   delay(100);
   pinMode(15, OUTPUT);
   digitalWrite(15, HIGH); //Turn on the builtin LED to indicate calibration
-
-  pinMode(countFinishedLed , OUTPUT);
-  pinMode(markerSensorPin, INPUT);
-  digitalWrite(countFinishedLed, LOW);
 
   for (uint16_t i = 0; i < 160; i++){ //4 seconds
   // TODO: Implements calibration until button pressed
