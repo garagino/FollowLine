@@ -12,6 +12,10 @@
 VespaMotors motor;
 QTRSensors qtr;
 
+// Set button and led pins
+const uint8_t PIN_BUTTON = 35;
+const uint8_t PIN_LED = 15;
+
 //Setup of the module of sensors:
 const uint8_t SensorCount = 8;
 uint16_t sensorValues[SensorCount];
@@ -43,15 +47,20 @@ void setup() {
   qtr.setTypeRC(); //For QTR-8RC      Sensor pins:
   qtr.setSensorPins((const uint8_t[]){17, 16, 18, 5, 23, 19, 22, 21}, SensorCount);
 
+  pinMode(PIN_BUTTON, INPUT);
+  pinMode(PIN_LED, OUTPUT);
+
   Serial.begin(115200);
   delay(100);
   pinMode(15, OUTPUT);
   digitalWrite(15, HIGH); //Turn on the builtin LED to indicate calibration
 
-  for (uint16_t i = 0; i < 160; i++){ //4 seconds
-  // TODO: Implements calibration until button pressed
+  // Calibration
+  Serial.println("Calibration start...");
+  while (digitalRead(PIN_BUTTON) == HIGH) { // Calibrates until the button is pressed
     qtr.calibrate();
   }
+  Serial.println("Calibration finished...");
 
   for (uint8_t i = 0; i < SensorCount; i++){
     Serial.print(qtr.calibrationOn.minimum[i]);
