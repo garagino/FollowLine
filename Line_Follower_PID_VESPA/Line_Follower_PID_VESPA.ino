@@ -76,12 +76,13 @@ void setup() {
   Serial.println();
   
   digitalWrite(15, LOW); // Turn off Arduino's LED to indicate the end of the calibration
-  delay(1000);
 
   //marker setup
   pinMode(countFinishedLed , OUTPUT);
   pinMode(markerSensorPin, INPUT);
   digitalWrite(countFinishedLed, LOW);
+
+  delay(2000); // Start loop after 2 seconds
 }
 
 void loop() {
