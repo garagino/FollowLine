@@ -27,7 +27,6 @@ bool robotRun = false;
 int markerCount = 10;
 int markerCountNow = 0;
 const int markerSensorPin = 36;
-const int countFinishedLed = 15;
 bool findLine = false;
 
 //------------------PID Control------------------- 
@@ -52,15 +51,15 @@ void setup() {
 
   Serial.begin(115200);
   delay(100);
-  pinMode(15, OUTPUT);
-  digitalWrite(15, HIGH); //Turn on the builtin LED to indicate calibration
 
   // Calibration
   Serial.println("Calibration start...");
+  digitalWrite(PIN_LED, HIGH);
   while (digitalRead(PIN_BUTTON) == HIGH) { // Calibrates until the button is pressed
     qtr.calibrate();
   }
   Serial.println("Calibration finished...");
+  digitalWrite(PIN_LED, LOW);
 
   for (uint8_t i = 0; i < SensorCount; i++){
     Serial.print(qtr.calibrationOn.minimum[i]);
@@ -74,13 +73,9 @@ void setup() {
     Serial.print(' ');
   }
   Serial.println();
-  
-  digitalWrite(15, LOW); // Turn off Arduino's LED to indicate the end of the calibration
 
   //marker setup
-  pinMode(countFinishedLed , OUTPUT);
   pinMode(markerSensorPin, INPUT);
-  digitalWrite(countFinishedLed, LOW);
 
   delay(2000); // Start loop after 2 seconds
 }
@@ -136,6 +131,6 @@ void markerChecker(){
   
   if(markerCountNow >= markerCount) {
    motor.stop();
-   digitalWrite(countFinishedLed, HIGH);
+   digitalWrite(PIN_LED, HIGH);
   }
 }
