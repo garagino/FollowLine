@@ -29,6 +29,9 @@ int markerCountNow = 0;
 const int markerSensorPin = 36;
 bool findLine = false;
 
+// Limit value of the margin of error
+const int MARGIN_ERROR = 20;
+
 //------------------PID Control------------------- 
 float P=0, I=0, D=0, PID=0, error=0, lastError=0;
 
@@ -97,10 +100,14 @@ void loop() {
 
   lSpeed = constrain(lSpeed, -maxSpeed, maxSpeed);
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
-  forwardOverride(20);
 
-  motor.turn(lSpeed, rSpeed);
-  
+  // If the error value is less than MARGIN_ERROR, move on
+  if(error > -MARGIN_ERROR && error > MARGIN_ERROR) {
+    motor.turn(maxSpeed, maxSpeed);
+  } else {
+    motor.turn(lSpeed, rSpeed);
+  }
+
   //check the markers
   markerChecker();
 }
@@ -110,12 +117,6 @@ int readSensors() {
     return qtr.readLineBlack(sensorValues);
   }else{//White line
     return qtr.readLineWhite(sensorValues);
-  }
-}
-
-void forwardOverride(int margin) {
-  if (error >= -margin and error <= margin) {
-    motor.turn(maxSpeed, maxSpeed);
   }
 }
 
