@@ -44,7 +44,7 @@ float Kd = 3;
 byte maxSpeed = 100;
 int lSpeed, rSpeed;
 
-bool isLineBlack = false;
+const bool LINE_BLACK = false;
 //-------------------------------------------------
 
 void setup() {
@@ -120,9 +120,9 @@ void loop() {
 }
 
 int readSensors() {
-  if (isLineBlack == true) {
+  if (LINE_BLACK) {
     return qtr.readLineBlack(sensorValues);
-  } else {  //White line
+  } else {
     return qtr.readLineWhite(sensorValues);
   }
 }
