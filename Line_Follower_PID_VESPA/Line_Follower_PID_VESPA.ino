@@ -28,7 +28,7 @@ bool robotRun = false;
 //Marker sensor variables
 int markerCount = 10;
 int markerCountNow = 0;
-const int markerSensorPin = 36;
+const int PIN_MARKER_SENSOR = 36;
 bool findLine = false;
 
 // Limit value of the margin of error
@@ -82,7 +82,7 @@ void setup() {
   Serial.println();
 
   //marker setup
-  pinMode(markerSensorPin, INPUT);
+  pinMode(PIN_MARKER_SENSOR, INPUT);
 
   delay(2000);  // Start loop after 2 seconds
 }
@@ -133,11 +133,11 @@ int readSensors() {
   @return `true` if the limit number of rows was detected.
 */
 bool markerChecker() {
-  if (analogRead(markerSensorPin) < 2000 && findLine == false) {
+  if (analogRead(PIN_MARKER_SENSOR) < 2000 && findLine == false) {
     findLine = true;
   }
 
-  if (analogRead(markerSensorPin) >= 2000 && findLine == true) {
+  if (analogRead(PIN_MARKER_SENSOR) >= 2000 && findLine == true) {
     findLine = false;
     markerCountNow++;
   }
