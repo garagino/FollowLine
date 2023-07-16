@@ -101,15 +101,18 @@ void loop() {
   lSpeed = constrain(lSpeed, -maxSpeed, maxSpeed);
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
-  // If the error value is less than MARGIN_ERROR, move on
-  if(error > -MARGIN_ERROR && error > MARGIN_ERROR) {
+  //If the error value is less than MARGIN_ERROR, move on
+  if(error >= -MARGIN_ERROR && error <= MARGIN_ERROR) {
     motor.turn(maxSpeed, maxSpeed);
   } else {
     motor.turn(lSpeed, rSpeed);
   }
 
-  //check the markers
-  markerChecker();
+  //Count the markers and stop the robot when reach a certain number
+  if(markerChecker()) {
+    digitalWrite(PIN_LED, HIGH);
+    motor.stop();
+  }
 }
 
 int readSensors() {
@@ -120,7 +123,7 @@ int readSensors() {
   }
 }
 
-void markerChecker(){
+bool markerChecker(){
   if(analogRead(markerSensorPin) < 2000 && findLine == false) {
     findLine = true;
   }
@@ -131,7 +134,9 @@ void markerChecker(){
   }
   
   if(markerCountNow >= markerCount) {
-   motor.stop();
-   digitalWrite(PIN_LED, HIGH);
+    return true;
+  }
+  else {
+    return false;
   }
 }
