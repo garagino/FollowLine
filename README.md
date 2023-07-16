@@ -14,12 +14,12 @@ O projeto engloba o uso de robôs seguidores de linha, cuja operação é embasa
 	<li>Motores DC de 6V/12V, 500RPM</li>
 	<li>Interruptor</li>
 </ul>
-* Para o correto funcionamento desta placa, são necessários os devidos drivers e a biblioteca. Sendo assim, disponibilizamos o link que direciona ao processo de obtenção e instalação dos referidos drivers e biblioteca, bem como tutoriais, no segundo link:
-https://www.robocore.net/tutoriais/instalacao-driver-da-blackboard
-https://www.robocore.net/tutoriais/vespa/
+* Para o correto funcionamento desta placa, são necessários os devidos drivers e a biblioteca. Sendo assim, disponibilizamos o link que direciona ao processo de obtenção e instalação dos referidos drivers e biblioteca, bem como tutoriais, no segundo link:<br>
+https://www.robocore.net/tutoriais/instalacao-driver-da-blackboard<br>
+https://www.robocore.net/tutoriais/vespa/<br>
 
-** Biblioteca do sensor QTR-8RC da Pololu:
-https://github.com/pololu/qtr-sensors-arduino
+** Biblioteca do sensor QTR-8RC da Pololu:<br>
+https://github.com/pololu/qtr-sensors-arduino<br>
 
 ## 😯 Como contribuir para o projeto
 
