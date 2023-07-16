@@ -5,8 +5,8 @@ O projeto engloba o uso de robôs seguidores de linha, cuja operação é embasa
 ## ⚙️ Hardware utilizado
 <ul>
 	<li>Ardu&iacute;no Uno/Nano - ATMEGA de 16Mhz</li>
-	<li>Vespa - ESP32 de 240Mhz, com uma motor shield embutida para 2 motores DC **</li> 
-	<li>QTR-8RC, array de 8 sensores digitais, produzida pela Pololu, cuja range varia entre 0 e 2500 para cada sensor individual</li>
+	<li>Vespa - ESP32 de 240Mhz, com uma motor shield embutida para 2 motores DC *</li> 
+	<li>QTR-8RC, array de 8 sensores digitais, produzida pela Pololu, cuja range varia entre 0 e 2500 para cada sensor individual **</li>
 	<li>Motor shield L298N, conhecida tamb&eacute;m por ponte H</li>
 	<li>Ball caster</li>
 	<li>Chassi feito em impressora 3D</li>
@@ -14,11 +14,12 @@ O projeto engloba o uso de robôs seguidores de linha, cuja operação é embasa
 	<li>Motores DC de 6V/12V, 500RPM</li>
 	<li>Interruptor</li>
 </ul>
-** Para o correto funcionamento desta placa, são necessários os devidos drivers e a biblioteca. Sendo assim, disponibilizamos o link que direciona ao processo de obtenção e instalação dos referidos drivers e da biblioteca:
+* Para o correto funcionamento desta placa, são necessários os devidos drivers e a biblioteca. Sendo assim, disponibilizamos o link que direciona ao processo de obtenção e instalação dos referidos drivers e biblioteca, bem como tutoriais, no segundo link:
 https://www.robocore.net/tutoriais/instalacao-driver-da-blackboard
-
-** Adicionalmente, segue o link fornecido pela fabricante, contendo tutoriais que demonstram de forma abrangente o uso dos recursos disponíveis, incluindo instruções detalhadas sobre como controlar os motores:
 https://www.robocore.net/tutoriais/vespa/
+
+** Biblioteca do sensor QTR-8RC da Pololu:
+https://github.com/pololu/qtr-sensors-arduino
 
 ## 😯 Como contribuir para o projeto
 
