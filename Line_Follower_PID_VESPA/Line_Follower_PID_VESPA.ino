@@ -6,8 +6,8 @@
 * from RoboCore and the Pololu's QTR-8RC sensor
 ****************************************************************/
 
-#include<RoboCore_Vespa.h> //Library for the Vespa microcontroller
-#include <QTRSensors.h> //Library for the QTR-8A or the QTR-8RC
+#include <RoboCore_Vespa.h>  //Library for the Vespa microcontroller
+#include <QTRSensors.h>      //Library for the QTR-8A or the QTR-8RC
 
 VespaMotors motor;
 QTRSensors qtr;
@@ -34,12 +34,12 @@ bool findLine = false;
 // Limit value of the margin of error
 const int MARGIN_ERROR = 20;
 
-//------------------PID Control------------------- 
-float P=0, I=0, D=0, PID=0, error=0, lastError=0;
+//------------------PID Control-------------------
+float P = 0, I = 0, D = 0, PID = 0, error = 0, lastError = 0;
 
-float Kp=0.25;
-float Ki=0.0001;
-float Kd=3;
+float Kp = 0.25;
+float Ki = 0.0001;
+float Kd = 3;
 
 byte maxSpeed = 100;
 int lSpeed, rSpeed;
@@ -48,34 +48,34 @@ bool isLineBlack = false;
 //-------------------------------------------------
 
 void setup() {
-  qtr.setTypeRC(); //For QTR-8RC      Sensor pins:
-  qtr.setSensorPins((const uint8_t[]){17, 16, 18, 5, 23, 19, 22, 21}, SensorCount);
+  qtr.setTypeRC();  //For QTR-8RC      Sensor pins:
+  qtr.setSensorPins((const uint8_t[]){ 17, 16, 18, 5, 23, 19, 22, 21 }, SensorCount);
 
   pinMode(PIN_BUTTON, INPUT);
   pinMode(PIN_LED, OUTPUT);
 
-  #ifdef DEBUG
-    Serial.begin(115200);
-    delay(100);
-  #endif
+#ifdef DEBUG
+  Serial.begin(115200);
+  delay(100);
+#endif
 
   // Calibration
   Serial.println("Calibration start...");
   digitalWrite(PIN_LED, HIGH);
-  while (digitalRead(PIN_BUTTON) == HIGH) { // Calibrates until the button is pressed
+  while (digitalRead(PIN_BUTTON) == HIGH) {  // Calibrates until the button is pressed
     qtr.calibrate();
   }
   Serial.println("Calibration finished...");
   digitalWrite(PIN_LED, LOW);
 
-  for (uint8_t i = 0; i < SensorCount; i++){
+  for (uint8_t i = 0; i < SensorCount; i++) {
     Serial.print(qtr.calibrationOn.minimum[i]);
     Serial.print(' ');
   }
   Serial.println();
 
   // print the calibration maximum values measured when emitters were on
-  for (uint8_t i = 0; i < SensorCount; i++){
+  for (uint8_t i = 0; i < SensorCount; i++) {
     Serial.print(qtr.calibrationOn.maximum[i]);
     Serial.print(' ');
   }
@@ -84,7 +84,7 @@ void setup() {
   //marker setup
   pinMode(markerSensorPin, INPUT);
 
-  delay(2000); // Start loop after 2 seconds
+  delay(2000);  // Start loop after 2 seconds
 }
 
 void loop() {
@@ -95,7 +95,7 @@ void loop() {
   P = error;
   I = I + error;
   D = error - lastError;
-  PID = (Kp*P) + (Ki*I) + (Kd*D);
+  PID = (Kp * P) + (Ki * I) + (Kd * D);
   lastError = error;
 
   //Control Motors
@@ -106,41 +106,40 @@ void loop() {
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
   //If the error value is less than MARGIN_ERROR, move on
-  if(error >= -MARGIN_ERROR && error <= MARGIN_ERROR) {
+  if (error >= -MARGIN_ERROR && error <= MARGIN_ERROR) {
     motor.turn(maxSpeed, maxSpeed);
   } else {
     motor.turn(lSpeed, rSpeed);
   }
 
   //Count the markers and stop the robot when reach a certain number
-  if(markerChecker()) {
+  if (markerChecker()) {
     digitalWrite(PIN_LED, HIGH);
     motor.stop();
   }
 }
 
 int readSensors() {
-  if(isLineBlack == true) {
+  if (isLineBlack == true) {
     return qtr.readLineBlack(sensorValues);
-  }else{//White line
+  } else {  //White line
     return qtr.readLineWhite(sensorValues);
   }
 }
 
-bool markerChecker(){
-  if(analogRead(markerSensorPin) < 2000 && findLine == false) {
+bool markerChecker() {
+  if (analogRead(markerSensorPin) < 2000 && findLine == false) {
     findLine = true;
   }
 
-  if(analogRead(markerSensorPin) >= 2000 && findLine == true) {
+  if (analogRead(markerSensorPin) >= 2000 && findLine == true) {
     findLine = false;
     markerCountNow++;
   }
-  
-  if(markerCountNow >= markerCount) {
+
+  if (markerCountNow >= markerCount) {
     return true;
-  }
-  else {
+  } else {
     return false;
   }
 }
