@@ -12,6 +12,8 @@
 VespaMotors motor;
 QTRSensors qtr;
 
+#define DEBUG
+
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
 const uint8_t PIN_LED = 15;
@@ -52,8 +54,10 @@ void setup() {
   pinMode(PIN_BUTTON, INPUT);
   pinMode(PIN_LED, OUTPUT);
 
-  Serial.begin(115200);
-  delay(100);
+  #ifdef DEBUG
+    Serial.begin(115200);
+    delay(100);
+  #endif
 
   // Calibration
   Serial.println("Calibration start...");
