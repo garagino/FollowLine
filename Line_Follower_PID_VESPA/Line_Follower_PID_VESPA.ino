@@ -127,6 +127,11 @@ int readSensors() {
   }
 }
 
+/**
+  Counts the number of crossed lines.
+
+  @return `true` if the limit number of rows was detected.
+*/
 bool markerChecker() {
   if (analogRead(markerSensorPin) < 2000 && findLine == false) {
     findLine = true;
