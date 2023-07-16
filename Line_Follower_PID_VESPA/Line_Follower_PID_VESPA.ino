@@ -139,7 +139,7 @@ bool markerChecker() {
 
   if (markerCountNow >= markerCount) {
     return true;
-  } else {
-    return false;
   }
+
+  return false;
 }
