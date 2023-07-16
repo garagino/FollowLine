@@ -2,6 +2,9 @@
 ## 💻 Sobre o projeto
 O projeto engloba o uso de robôs seguidores de linha, cuja operação é embasada em um sistema de controle PID. Essa abordagem garante a capacidade de realizar movimentos precisos e meticulosamente controlados. O robô  também é compatível com a tecnologia Bluetooth, o que possibilita o controle em tempo real dos valores do PID, proporcionando um ajuste instantâneo e eficaz.
 
+## 🔧 Versão 
+Esta é a versão(branch) para a <a href="https://github.com/garagino/Followline/tree/main-vespa/Line_Follower_PID_VESPA">Vespa</a>. Há também a versão para o <a href="https://github.com/garagino/Followline/tree/main-arduino">Arduíno</a>. Adicionalmente, há uma branch para <a href="https://github.com/garagino/Followline/tree/teste">testar motores</a>.
+
 ## ⚙️ Hardware utilizado
 <ul>
 	<li>Ardu&iacute;no Uno/Nano - ATMEGA de 16Mhz</li>
