@@ -6,13 +6,13 @@
 * from RoboCore and the Pololu's QTR-8RC sensor
 ****************************************************************/
 
+#define DEBUG
+
 #include <RoboCore_Vespa.h>  // Library for the Vespa microcontroller
 #include <QTRSensors.h>      // Library for the QTR-8A or the QTR-8RC
 
 VespaMotors motor;
 QTRSensors qtr;
-
-#define DEBUG
 
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
