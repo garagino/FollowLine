@@ -60,14 +60,14 @@ void setup() {
 #endif
 
   // Calibration
-  Serial.println("Calibration start...");
   digitalWrite(PIN_LED, HIGH);
   while (digitalRead(PIN_BUTTON) == HIGH) {  // Calibrates until the button is pressed
     qtr.calibrate();
   }
-  Serial.println("Calibration finished...");
   digitalWrite(PIN_LED, LOW);
 
+#ifdef DEBUG
+  // print the calibration minimum values measured when emitters were on
   for (uint8_t i = 0; i < SensorCount; i++) {
     Serial.print(qtr.calibrationOn.minimum[i]);
     Serial.print(' ');
@@ -80,6 +80,7 @@ void setup() {
     Serial.print(' ');
   }
   Serial.println();
+#endif
 
   //marker setup
   pinMode(PIN_MARKER_SENSOR, INPUT);
