@@ -22,6 +22,9 @@ const uint8_t PIN_LED = 15;
 const uint8_t SENSOR_COUNT = 8;       // The number of sensors, which should match the length of the pins array
 uint16_t sensorValues[SENSOR_COUNT];  // An array in which to store the calibrated sensor readings
 
+// Maximum line position, considering the amount of sensors.
+const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
+
 //Stop sensor variable
 bool robotRun = false;
 
@@ -89,8 +92,9 @@ void setup() {
 }
 
 void loop() {
-  // Read sensors
-  error = map(readSensors(), 0, 7000, -1000, 1000);
+  // readSensors() returns the line position between 0 and `MAX_POSITION`.
+  // error is a re-map from -1000 to 1000 range.
+  error = map(readSensors(), 0, MAX_POSITION, -1000, 1000);
 
   // Calculate PID
   p = error;
