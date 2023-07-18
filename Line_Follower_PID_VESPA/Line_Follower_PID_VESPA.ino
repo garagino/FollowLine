@@ -63,6 +63,7 @@ void setup() {
   qtr.setSensorPins((const uint8_t[]){ 17, 16, 18, 5, 23, 19, 22, 21 }, SENSOR_COUNT);
 
   pinMode(PIN_BUTTON, INPUT);
+  pinMode(PIN_MARKER_SENSOR, INPUT);
   pinMode(PIN_LED, OUTPUT);
 
 #ifdef DEBUG
@@ -101,9 +102,6 @@ void setup() {
   }
   Serial.println();
 #endif
-
-  // Marker setup
-  pinMode(PIN_MARKER_SENSOR, INPUT);
 
   delay(2000);  // Start loop after 2 seconds
 }
@@ -173,6 +171,12 @@ bool markerChecker() {
 
 #ifdef DEBUG
 
+/**
+  Returns all stream of data sent over bluetooth until the
+  button is pressed.
+
+  @return `String` with the message sent by the bluetooth device
+*/
 String receiveBtMessage() {
   String message;
   char incomingChar;
@@ -189,6 +193,16 @@ String receiveBtMessage() {
   return message;
 }
 
+/**
+  Returns a `double` of the number in the `String`, in the index
+  position, separated by the delimiter `char`.
+
+  @param `data` String with the message
+  @param `separator` Character dividing the string into split groups.
+  @param `index` Position of the element to be returned
+  @return `double` Number in the indicated position. If there is
+  no value at this position, it returns 0.
+*/
 double splitString(String data, char separator, int index) {
   int found = 0;
   int startIndex = 0, endIndex = -1;
