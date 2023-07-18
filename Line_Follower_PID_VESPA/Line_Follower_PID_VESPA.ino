@@ -11,6 +11,14 @@
 #include <RoboCore_Vespa.h>  // Library for the Vespa microcontroller
 #include <QTRSensors.h>      // Library for the QTR-8A or the QTR-8RC
 
+#include "BluetoothSerial.h"
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+BluetoothSerial SerialBT;
+
 VespaMotors motor;
 QTRSensors qtr;
 
@@ -60,6 +68,15 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(115200);
   delay(100);
+
+  SerialBT.begin("Mutuca|Motoneta");  //Bluetooth device name
+  Serial.println("Start BT communication");
+  String btMessage = receiveBtMessage();
+
+  Kp = splitString(btMessage, ' ', 0);
+  Ki = splitString(btMessage, ' ', 1);
+  Kd = splitString(btMessage, ' ', 2);
+  delay(500);
 #endif
 
   // Calibration
@@ -153,3 +170,42 @@ bool markerChecker() {
 
   return false;
 }
+
+#ifdef DEBUG
+
+String receiveBtMessage() {
+  String message;
+  char incomingChar;
+
+  digitalWrite(PIN_LED, HIGH);
+  while (digitalRead(PIN_BUTTON) == HIGH) {
+    if (SerialBT.available()) {
+      incomingChar = SerialBT.read();
+      message += String(incomingChar);
+    }
+  }
+  digitalWrite(PIN_LED, LOW);
+
+  return message;
+}
+
+double splitString(String data, char separator, int index) {
+  int found = 0;
+  int startIndex = 0, endIndex = -1;
+  int maxIndex = data.length() - 1;
+
+  for (int i = 0; i <= maxIndex && found <= index; i++) {
+    if (data.charAt(i) == separator || i == maxIndex) {
+      found++;
+      startIndex = endIndex + 1;
+      endIndex = (i == maxIndex) ? i + 1 : i;
+    }
+  }
+
+  if (found <= index) {
+    return 0.0;
+  }
+
+  return atof(data.substring(startIndex, endIndex).c_str());
+}
+#endif
