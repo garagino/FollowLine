@@ -8,23 +8,25 @@
 
 #define DEBUG
 
-#include <RoboCore_Vespa.h>  // Library for the Vespa microcontroller
-#include <QTRSensors.h>      // Library for the QTR-8A or the QTR-8RC
-
+#ifdef DEBUG
 #include "BluetoothSerial.h"
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
+#endif
 
-BluetoothSerial SerialBT;
+#include <RoboCore_Vespa.h>  // Library for the Vespa microcontroller
+#include <QTRSensors.h>      // Library for the QTR-8A or the QTR-8RC
 
-VespaMotors motor;
-QTRSensors qtr;
+VespaMotors motor;         // Vespa Motor Object
+QTRSensors qtr;            // QTR Sensor
+BluetoothSerial SerialBT;  // Bluetooth Serial instance
 
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
 const uint8_t PIN_LED = 15;
+const uint8_t PIN_MARKER_SENSOR = 36;
 
 //Setup of the module of sensors
 const uint8_t SENSOR_COUNT = 8;       // The number of sensors, which should match the length of the pins array
@@ -39,7 +41,6 @@ bool robotRun = false;
 //Marker sensor variables
 int markerCount = 10;
 int markerCountNow = 0;
-const int PIN_MARKER_SENSOR = 36;
 bool findLine = false;
 
 // Limit value of the margin of error
@@ -70,7 +71,7 @@ void setup() {
   Serial.begin(115200);
   delay(100);
 
-  SerialBT.begin("Mutuca|Motoneta");  //Bluetooth device name
+  SerialBT.begin("Mutuca|Motoneta");  // Bluetooth device name
   Serial.println("Start BT communication");
   String btMessage = receiveBtMessage();
 
@@ -194,7 +195,7 @@ String receiveBtMessage() {
 }
 
 /**
-  Returns a `double` of the number in the `String`, in the index
+  Returns the number in the `String`, in the index
   position, separated by the delimiter `char`.
 
   @param `data` String with the message
