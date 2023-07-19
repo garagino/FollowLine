@@ -87,6 +87,8 @@ void setup() {
       Kd = getNumber(btMessage, 3);
     } else if (prefix == "vel") {
       maxSpeed = getNumber(btMessage, 1);
+    } else if (prefix == "cnt") {
+      markerCount = getNumber(btMessage, 1);
     } else if (prefix == "end") {
       break;
     }
