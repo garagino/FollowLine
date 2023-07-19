@@ -85,6 +85,8 @@ void setup() {
       Kp = getNumber(btMessage, 1);
       Ki = getNumber(btMessage, 2);
       Kd = getNumber(btMessage, 3);
+    } else if (prefix == "vel") {
+      maxSpeed = getNumber(btMessage, 1);
     } else if (prefix == "end") {
       break;
     }
