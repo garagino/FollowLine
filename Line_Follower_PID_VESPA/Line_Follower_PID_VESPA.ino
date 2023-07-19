@@ -14,6 +14,7 @@
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
+BluetoothSerial SerialBT;  // Bluetooth Serial instance
 #endif
 
 #include <RoboCore_Vespa.h>  // Library for the Vespa microcontroller
@@ -21,7 +22,6 @@
 
 VespaMotors motor;         // Vespa Motor Object
 QTRSensors qtr;            // QTR Sensor
-BluetoothSerial SerialBT;  // Bluetooth Serial instance
 
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
