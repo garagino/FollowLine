@@ -186,11 +186,15 @@ String receiveBtMessage() {
   while (digitalRead(PIN_BUTTON) == HIGH) {
     if (SerialBT.available()) {
       incomingChar = SerialBT.read();
+
+      if (incomingChar == '\n') break;
+
       message += String(incomingChar);
     }
   }
   digitalWrite(PIN_LED, LOW);
 
+  message.trim();
   return message;
 }
 
