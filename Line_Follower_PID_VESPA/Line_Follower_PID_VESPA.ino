@@ -77,7 +77,7 @@ void setup() {
   String btMessage;
   String prefix;
 
-  while (prefix != "end" || digitalRead(PIN_BUTTON) == HIGH) {
+  while (prefix != "end" && digitalRead(PIN_BUTTON) == HIGH) {
     btMessage = receiveBtMessage();
     prefix = getPrefix(btMessage);
 
@@ -93,6 +93,8 @@ void setup() {
       break;
     }
   }
+
+  SerialBT.println("Configured parameters");
 
   delay(500);
 #endif
