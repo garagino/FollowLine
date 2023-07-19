@@ -20,8 +20,8 @@ BluetoothSerial SerialBT;  // Bluetooth Serial instance
 #include <RoboCore_Vespa.h>  // Library for the Vespa microcontroller
 #include <QTRSensors.h>      // Library for the QTR-8A or the QTR-8RC
 
-VespaMotors motor;         // Vespa Motor Object
-QTRSensors qtr;            // QTR Sensor
+VespaMotors motor;  // Vespa Motor Object
+QTRSensors qtr;     // QTR Sensor
 
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
@@ -142,17 +142,13 @@ void loop() {
   lSpeed = constrain(lSpeed, -maxSpeed, maxSpeed);
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
-  // If the error value is less than MARGIN_ERROR, move on
-  if (error >= -MARGIN_ERROR && error <= MARGIN_ERROR) {
-    motor.turn(maxSpeed, maxSpeed);
-  } else {
-    motor.turn(lSpeed, rSpeed);
-  }
-
-  // Count the markers and stop the robot when reach a certain number
-  if (markerChecker()) {
+  if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
     digitalWrite(PIN_LED, HIGH);
     motor.stop();
+  } else if (error >= -MARGIN_ERROR && error <= MARGIN_ERROR) {  // If the error is within the MARGIN_ERROR, move on
+    motor.turn(maxSpeed, maxSpeed);
+  } else {  // If the error is outside the error range, continue doing PID
+    motor.turn(lSpeed, rSpeed);
   }
 }
 
