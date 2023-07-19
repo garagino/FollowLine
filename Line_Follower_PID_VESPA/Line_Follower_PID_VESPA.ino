@@ -73,11 +73,23 @@ void setup() {
 
   SerialBT.begin("Mutuca|Motoneta");  // Bluetooth device name
   Serial.println("Start BT communication");
-  String btMessage = receiveBtMessage();
 
-  Kp = splitString(btMessage, ' ', 0);
-  Ki = splitString(btMessage, ' ', 1);
-  Kd = splitString(btMessage, ' ', 2);
+  String btMessage;
+  String prefix;
+
+  while (prefix != "end" || digitalRead(PIN_BUTTON) == HIGH) {
+    btMessage = receiveBtMessage();
+    prefix = getPrefix(btMessage);
+
+    if (prefix == "pid") {
+      Kp = getNumber(btMessage, 1);
+      Ki = getNumber(btMessage, 2);
+      Kd = getNumber(btMessage, 3);
+    } else if (prefix == "end") {
+      break;
+    }
+  }
+
   delay(500);
 #endif
 
@@ -198,17 +210,25 @@ String receiveBtMessage() {
   return message;
 }
 
+String getPrefix(String data) {
+  return getElement(data, 0);
+}
+
+double getNumber(String data, int index) {
+  return atof(getElement(data, index).c_str());
+}
+
 /**
-  Returns the number in the `String`, in the index
-  position, separated by the delimiter `char`.
+  Returns a sub-string in the `String` data, in the index
+  position.
 
   @param `data` String with the message
-  @param `separator` Character dividing the string into split groups.
   @param `index` Position of the element to be returned
-  @return `double` Number in the indicated position. If there is
-  no value at this position, it returns 0.
+  @return `String` sub-string in the indicated position. If there is
+  no value at this position, it returns empty string.
 */
-double splitString(String data, char separator, int index) {
+String getElement(String data, int index) {
+  char separator = ' ';
   int found = 0;
   int startIndex = 0, endIndex = -1;
   int maxIndex = data.length() - 1;
@@ -222,9 +242,9 @@ double splitString(String data, char separator, int index) {
   }
 
   if (found <= index) {
-    return 0.0;
+    return "";
   }
 
-  return atof(data.substring(startIndex, endIndex).c_str());
+  return data.substring(startIndex, endIndex);
 }
 #endif
