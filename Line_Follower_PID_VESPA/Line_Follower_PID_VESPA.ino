@@ -175,6 +175,10 @@ bool markerChecker() {
   if (analogRead(PIN_MARKER_SENSOR) >= 2000 && findLine == true) {
     findLine = false;
     markerCountNow++;
+
+#ifdef DEBUG
+    SerialBT.println(markerCountNow);
+#endif
   }
 
   if (markerCountNow >= markerCount) {
