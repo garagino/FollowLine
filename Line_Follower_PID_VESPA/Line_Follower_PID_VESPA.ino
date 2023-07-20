@@ -55,7 +55,7 @@ float Kp = 0.25;
 float Ki = 0.0001;
 float Kd = 3;
 
-byte maxSpeed = 100;
+int maxSpeed = 100;
 int lSpeed, rSpeed;
 
 const bool LINE_BLACK = false;
