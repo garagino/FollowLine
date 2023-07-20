@@ -7,6 +7,8 @@
 ****************************************************************/
 
 #define DEBUG
+#define BT_NAME "Cacununga"
+// Names: Mutuca | Motoneta | Cacununga
 
 #ifdef DEBUG
 #include "BluetoothSerial.h"
@@ -71,7 +73,7 @@ void setup() {
   Serial.begin(115200);
   delay(100);
 
-  SerialBT.begin("Mutuca|Motoneta");  // Bluetooth device name
+  SerialBT.begin(BT_NAME);  // Bluetooth device name
   Serial.println("Start BT communication");
 
   String btMessage;
