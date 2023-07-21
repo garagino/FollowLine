@@ -96,7 +96,21 @@ void setup() {
     }
   }
 
-  SerialBT.println("Configured parameters");
+  SerialBT.println("Configured parameters:");
+  SerialBT.print(">> P: ");
+  SerialBT.print(Kp, 4);
+  SerialBT.print(" | I: ");
+  SerialBT.print(Ki, 4);
+  SerialBT.print(" | Kd: ");
+  SerialBT.println(Kd, 4);
+
+  SerialBT.print(">> Speed: ");
+  SerialBT.println(maxSpeed);
+
+  SerialBT.print(">> Count lines: ");
+  SerialBT.println(markerCount);
+
+  SerialBT.println("Start Calibration...");
 
   delay(500);
 #endif
