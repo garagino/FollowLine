@@ -74,7 +74,7 @@ void setup() {
   delay(100);
 
   SerialBT.begin(BT_NAME);  // Bluetooth device name
-  Serial.println("Start BT communication");
+  SerialBT.println("Start BT communication");
 
   String btMessage;
   String prefix;
@@ -125,17 +125,17 @@ void setup() {
 #ifdef DEBUG
   // Print the calibration minimum values measured when emitters were on
   for (uint8_t i = 0; i < SENSOR_COUNT; i++) {
-    Serial.print(qtr.calibrationOn.minimum[i]);
-    Serial.print(' ');
+    SerialBT.print(qtr.calibrationOn.minimum[i]);
+    SerialBT.print(' ');
   }
-  Serial.println();
+  SerialBT.println();
 
   // Print the calibration maximum values measured when emitters were on
   for (uint8_t i = 0; i < SENSOR_COUNT; i++) {
-    Serial.print(qtr.calibrationOn.maximum[i]);
-    Serial.print(' ');
+    SerialBT.print(qtr.calibrationOn.maximum[i]);
+    SerialBT.print(' ');
   }
-  Serial.println();
+  SerialBT.println();
 #endif
 
   delay(2000);  // Start loop after 2 seconds
