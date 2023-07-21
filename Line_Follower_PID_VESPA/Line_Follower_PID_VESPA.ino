@@ -7,7 +7,7 @@
 ****************************************************************/
 
 #define DEBUG
-#define BT_NAME "I forgot to set a name"
+#define BT_NAME "Van Dyne"
 // Names: Mutuca | Motoneta | Cacununga
 
 #ifdef DEBUG
@@ -41,7 +41,7 @@ const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 bool robotRun = false;
 
 //Marker sensor variables
-int markerCount = 10;
+int markerCount = 57;
 int markerCountNow = 0;
 bool findLine = false;
 
@@ -63,7 +63,7 @@ const bool LINE_BLACK = false;
 
 void setup() {
   qtr.setTypeRC();  // For QTR-8RC      Sensor pins:
-  qtr.setSensorPins((const uint8_t[]){ 17, 16, 18, 5, 23, 19, 22, 21 }, SENSOR_COUNT);
+  qtr.setSensorPins((const uint8_t[]){ 21, 19, 5, 16, 22, 23, 18, 17 }, SENSOR_COUNT);
 
   pinMode(PIN_BUTTON, INPUT);
   pinMode(PIN_MARKER_SENSOR, INPUT);
