@@ -7,7 +7,7 @@
 ****************************************************************/
 
 #define DEBUG
-#define BT_NAME "Cacununga"
+#define BT_NAME "I forgot to set a name"
 // Names: Mutuca | Motoneta | Cacununga
 
 #ifdef DEBUG
@@ -147,8 +147,9 @@ void loop() {
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
-    digitalWrite(PIN_LED, HIGH);
     motor.stop();
+    markerCountNow = 0;
+    setup();
   } else if (error >= -MARGIN_ERROR && error <= MARGIN_ERROR) {  // If the error is within the MARGIN_ERROR, move on
     motor.turn(maxSpeed, maxSpeed);
   } else {  // If the error is outside the error range, continue doing PID
