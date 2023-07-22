@@ -7,8 +7,8 @@
 ****************************************************************/
 
 #define DEBUG
-#define BT_NAME "Van Dyne"
-// Names: Mutuca | Motoneta | Cacununga
+#define BT_NAME "I forgot to set a name"
+// Names: Mutuca | Motoneta | Van Dyne
 
 #ifdef DEBUG
 #include "BluetoothSerial.h"
