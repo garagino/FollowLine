@@ -45,8 +45,24 @@ int markerCount = 57;
 int markerCountNow = 0;
 bool findLine = false;
 
+
+  // error is a re-map from -1000 to 1000 range.
+  const int  Max_remap=1000;
+  const int  Min_remap=-1000;
+
+//setup
+const int Begin_value=115200;
+
+// delays values
+const int Setup_Begin_Delay=100;
+
+
 // Limit value of the margin of error
 const int MARGIN_ERROR = 20;
+
+//setup sensor pins for qtr-8rc 
+const uint8_t[] QTR_8RC={ 21, 19, 5, 16, 22, 23, 18, 17 }
+
 
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
@@ -63,15 +79,15 @@ const bool LINE_BLACK = false;
 
 void setup() {
   qtr.setTypeRC();  // For QTR-8RC      Sensor pins:
-  qtr.setSensorPins((const uint8_t[]){ 21, 19, 5, 16, 22, 23, 18, 17 }, SENSOR_COUNT);
+  qtr.setSensorPins(QTR_8RC, SENSOR_COUNT);
 
   pinMode(PIN_BUTTON, INPUT);
   pinMode(PIN_MARKER_SENSOR, INPUT);
   pinMode(PIN_LED, OUTPUT);
 
 #ifdef DEBUG
-  Serial.begin(115200);
-  delay(100);
+  Serial.begin(Begin_value);
+  delay(Setup_Begin_Delay);
 
   SerialBT.begin(BT_NAME);  // Bluetooth device name
   SerialBT.println("Start BT communication");
@@ -144,7 +160,7 @@ void setup() {
 void loop() {
   // readSensors() returns the line position between 0 and `MAX_POSITION`.
   // error is a re-map from -1000 to 1000 range.
-  error = map(readSensors(), 0, MAX_POSITION, -1000, 1000);
+  error = map(readSensors(), 0, MAX_POSITION, Min_remap, Max_remap);
 
   // Calculate PID
   p = error;
