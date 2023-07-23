@@ -4,27 +4,24 @@
 * Author      : Luiz Eduardo
 * Description : A Script to test the components for the project.               
 ****************************************************************/
+
 #include <RoboCore_Vespa.h>  // Library for the Vespa microcontroller
 #include <QTRSensors.h>      // Library for the QTR-8A or the QTR-8RC
 
-VespaMotors motor;         // Vespa Motor Object
-QTRSensors qtr;            // QTR Sensor
+VespaMotors motor;  // Vespa Motor Object
+QTRSensors qtr;     // QTR Sensor
 
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
 const uint8_t PIN_LED = 15;
 const uint8_t PIN_MARKER_SENSOR = 36;
 
-
 const int PAUSE_TIME = 3000;
-long speed = 100; 
+long speed = 100;
 
 //Setup of the module of sensors
 const uint8_t SENSOR_COUNT = 8;       // The number of sensors, which should match the length of the pins array
 uint16_t sensorValues[SENSOR_COUNT];  // An array in which to store the calibrated sensor readings
-
-
-
 
 void setup() {
   Serial.begin(115200);
@@ -42,22 +39,19 @@ void loop() {
   //vespaTestMotors();
 }
 
-void auxSensorTest(){
+void auxSensorTest() {
   delay(250);
   Serial.println(digitalRead(PIN_MARKER_SENSOR));
   Serial.println(analogRead(PIN_MARKER_SENSOR));
 }
 
-
-void mainSensorTest(){
-  
+void mainSensorTest() {
   // read raw sensor values
   qtr.read(sensorValues);
 
   // print the sensor values as numbers from 0 to 2500, where 0 means maximum
   // reflectance and 2500 means minimum reflectance
-  for (uint8_t i = 0; i < SENSOR_COUNT; i++)
-  {
+  for (uint8_t i = 0; i < SENSOR_COUNT; i++) {
     Serial.print(sensorValues[i]);
     Serial.print('\t');
   }
@@ -65,17 +59,17 @@ void mainSensorTest(){
   Serial.println();
 }
 
-void vespaTestMotors(){
+void vespaTestMotors() {
   Serial.println("Forward");
   motor.forward(speed);
   delay(PAUSE_TIME);
   motor.stop();
-  
+
   Serial.println("Backward");
   motor.backward(speed);
   delay(PAUSE_TIME);
   motor.stop();
-  
+
   Serial.println("Left 1");
   motor.setSpeedLeft(speed);
   delay(PAUSE_TIME);
@@ -84,7 +78,7 @@ void vespaTestMotors(){
   motor.setSpeedLeft(-speed);
   delay(PAUSE_TIME);
   motor.stop();
-  
+
   Serial.println("Right 1");
   motor.setSpeedRight(speed);
   delay(PAUSE_TIME);
@@ -93,11 +87,11 @@ void vespaTestMotors(){
   motor.setSpeedRight(-speed);
   delay(PAUSE_TIME);
   motor.stop();
-  
+
   Serial.println("Turn");
-  motor.turn(90,30);
+  motor.turn(90, 30);
   delay(PAUSE_TIME);
   motor.stop();
-  
+
   delay(PAUSE_TIME);
 }
