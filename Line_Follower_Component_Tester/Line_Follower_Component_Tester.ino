@@ -31,7 +31,7 @@ void setup() {
   delay(100);
 
   qtr.setTypeRC();  // For QTR-8RC      Sensor pins:
-  qtr.setSensorPins((const uint8_t[]){ 17, 16, 18, 5, 23, 19, 22, 21 }, SENSOR_COUNT);
+  qtr.setSensorPins((const uint8_t[]){ 21, 19, 5, 16, 22, 23, 18, 17 }, SENSOR_COUNT);
 
   pinMode(PIN_MARKER_SENSOR, INPUT);
 }
