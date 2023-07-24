@@ -37,9 +37,6 @@ uint16_t sensorValues[SENSOR_COUNT];  // An array in which to store the calibrat
 // Maximum line position, considering the amount of sensors.
 const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 
-//Stop sensor variable
-bool robotRun = false;
-
 //Marker sensor variables
 int markerCount = 57;
 int markerCountNow = 0;
