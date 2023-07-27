@@ -38,11 +38,8 @@ uint16_t sensorValues[SENSOR_COUNT];  // An array in which to store the calibrat
 const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 
 //Marker sensor variables
-int markerCount = 57;
-int markerCountNow = 0;
 float startMakerChecker = 45000;
 float initialTime;
-bool findLine = false;
 
 // Limit value of the margin of error
 int marginError = 20;
@@ -88,8 +85,8 @@ void setup() {
       Kd = getNumber(btMessage, 3);
     } else if (prefix == "vel") {
       maxSpeed = getNumber(btMessage, 1);
-    } else if (prefix == "cnt") {
-      markerCount = getNumber(btMessage, 1);
+    } else if (prefix == "tim") {
+      startMakerChecker = getNumber(btMessage, 1);
     } else if (prefix == "err") {
       marginError = getNumber(btMessage, 1);
     } else if (prefix == "pri") {
@@ -154,7 +151,6 @@ void loop() {
 
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
     motor.stop();
-    markerCountNow = 0;
     setup();
   } else if (error >= -marginError && error <= marginError) {  // If the error is within the MARGIN_ERROR, move on
     motor.turn(maxSpeed, maxSpeed);
@@ -265,8 +261,8 @@ void printParameters() {
   SerialBT.print(">> Speed: ");
   SerialBT.println(maxSpeed);
 
-  SerialBT.print(">> Count lines: ");
-  SerialBT.println(markerCount);
+  SerialBT.print(">> Time delay: ");
+  SerialBT.println(startMakerChecker);
 
   SerialBT.print(">> Margin Error: ");
   SerialBT.println(marginError);
