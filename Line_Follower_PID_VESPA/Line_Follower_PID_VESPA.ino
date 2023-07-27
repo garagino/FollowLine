@@ -40,6 +40,8 @@ const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 //Marker sensor variables
 int markerCount = 57;
 int markerCountNow = 0;
+float startMakerChecker = 45000;
+float initialTime;
 bool findLine = false;
 
 // Limit value of the margin of error
@@ -128,6 +130,7 @@ void setup() {
 #endif
 
   delay(2000);  // Start loop after 2 seconds
+  initialTime = millis();
 }
 
 void loop() {
@@ -169,26 +172,16 @@ int readSensors() {
 }
 
 /**
-  Counts the number of crossed lines.
+  Verifies if there is a end line after a set time
 
-  @return `true` if the limit number of rows was detected.
+  @return `true` if the end line was detected.
 */
 bool markerChecker() {
-  if (analogRead(PIN_MARKER_SENSOR) < 2000 && findLine == false) {
-    findLine = true;
-  }
+  if (startMakerChecker < millis() - initialTime) {
 
-  if (analogRead(PIN_MARKER_SENSOR) >= 2000 && findLine == true) {
-    findLine = false;
-    markerCountNow++;
-
-#ifdef DEBUG
-    SerialBT.println(markerCountNow);
-#endif
-  }
-
-  if (markerCountNow >= markerCount) {
-    return true;
+    if (analogRead(PIN_MARKER_SENSOR) < 2000) {
+      return true;
+    }
   }
 
   return false;
