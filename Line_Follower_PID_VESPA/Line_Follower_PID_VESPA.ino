@@ -90,24 +90,14 @@ void setup() {
       markerCount = getNumber(btMessage, 1);
     } else if (prefix == "err") {
       marginError = getNumber(btMessage, 1);
+    } else if (prefix == "pri") {
+      printParameters();
     } else if (prefix == "end") {
       break;
     }
   }
 
-  SerialBT.println("Configured parameters:");
-  SerialBT.print(">> P: ");
-  SerialBT.print(Kp, 4);
-  SerialBT.print(" | I: ");
-  SerialBT.print(Ki, 4);
-  SerialBT.print(" | Kd: ");
-  SerialBT.println(Kd, 4);
-
-  SerialBT.print(">> Speed: ");
-  SerialBT.println(maxSpeed);
-
-  SerialBT.print(">> Count lines: ");
-  SerialBT.println(markerCount);
+  printParameters();
 
   SerialBT.println("Start Calibration...");
 
@@ -269,4 +259,24 @@ String getElement(String data, int index) {
 
   return data.substring(startIndex, endIndex);
 }
+
+void printParameters() {
+  SerialBT.println("Configured parameters:");
+  SerialBT.print(">> P: ");
+  SerialBT.print(Kp, 4);
+  SerialBT.print(" | I: ");
+  SerialBT.print(Ki, 4);
+  SerialBT.print(" | Kd: ");
+  SerialBT.println(Kd, 4);
+
+  SerialBT.print(">> Speed: ");
+  SerialBT.println(maxSpeed);
+
+  SerialBT.print(">> Count lines: ");
+  SerialBT.println(markerCount);
+
+  SerialBT.print(">> Margin Error: ");
+  SerialBT.println(marginError);
+}
+
 #endif
