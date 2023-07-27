@@ -151,6 +151,11 @@ void loop() {
 
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
     motor.stop();
+#ifdef DEBUG
+    SerialBT.print(">> Timelapse: ");
+    SerialBT.print(millis() - initialTime);
+    SerialBT.println(" seconds");
+#endif
     setup();
   } else if (error >= -marginError && error <= marginError) {  // If the error is within the MARGIN_ERROR, move on
     motor.turn(maxSpeed, maxSpeed);
