@@ -43,7 +43,7 @@ int markerCountNow = 0;
 bool findLine = false;
 
 // Limit value of the margin of error
-const int MARGIN_ERROR = 20;
+int marginError = 20;
 
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
@@ -88,6 +88,8 @@ void setup() {
       maxSpeed = getNumber(btMessage, 1);
     } else if (prefix == "cnt") {
       markerCount = getNumber(btMessage, 1);
+    } else if (prefix == "err") {
+      marginError = getNumber(btMessage, 1);
     } else if (prefix == "end") {
       break;
     }
@@ -161,7 +163,7 @@ void loop() {
     motor.stop();
     markerCountNow = 0;
     setup();
-  } else if (error >= -MARGIN_ERROR && error <= MARGIN_ERROR) {  // If the error is within the MARGIN_ERROR, move on
+  } else if (error >= -marginError && error <= marginError) {  // If the error is within the MARGIN_ERROR, move on
     motor.turn(maxSpeed, maxSpeed);
   } else {  // If the error is outside the error range, continue doing PID
     motor.turn(lSpeed, rSpeed);
