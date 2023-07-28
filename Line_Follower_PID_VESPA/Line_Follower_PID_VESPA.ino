@@ -38,8 +38,8 @@ uint16_t sensorValues[SENSOR_COUNT];  // An array in which to store the calibrat
 const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 
 //Marker sensor variables
-float startMakerChecker = 45000;
-float initialTime;
+unsigned long startMakerChecker = 45000L;
+unsigned long initialTime;
 
 // Limit value of the margin of error
 int marginError = 20;
