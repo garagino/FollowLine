@@ -38,20 +38,20 @@ uint16_t sensorValues[SENSOR_COUNT];  // An array in which to store the calibrat
 const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 
 //Marker sensor variables
-unsigned long startMakerChecker = 45000L;
+unsigned long startMakerChecker = 39500L;
 unsigned long initialTime;
 
 // Limit value of the margin of error
-int marginError = 50;
+int marginError = 20;
 const int ERROR_SIZE = 1000;
 float errosValues[ERROR_SIZE];
 
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
 
-float Kp = 0.25;
+float Kp = 0.3;
 float Ki = 0.0001;
-float Kd = 3;
+float Kd = 3.5;
 
 int maxSpeed = 100;
 int lSpeed, rSpeed;
