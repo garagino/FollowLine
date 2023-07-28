@@ -42,7 +42,7 @@ unsigned long startMakerChecker = 45000L;
 unsigned long initialTime;
 
 // Limit value of the margin of error
-int marginError = 20;
+int marginError = 50;
 
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
