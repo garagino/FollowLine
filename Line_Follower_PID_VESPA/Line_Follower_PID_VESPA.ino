@@ -43,8 +43,6 @@ unsigned long initialTime;
 
 // Limit value of the margin of error
 int marginError = 20;
-const int ERROR_SIZE = 1000;
-float errosValues[ERROR_SIZE];
 
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
@@ -154,11 +152,6 @@ void loop() {
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
     motor.stop();
 #ifdef DEBUG
-    for (int i=0; i<ERROR_SIZE; i++) {
-      SerialBT.print(F("error: "));
-      SerialBT.println(errosValues[i]);
-    }
-
     SerialBT.print(">> Timelapse: ");
     SerialBT.print(millis() - initialTime);
     SerialBT.println(" seconds");
@@ -187,15 +180,6 @@ int readSensors() {
 bool markerChecker() {
   static int i = 0;
   if (startMakerChecker < millis() - initialTime) {
-#ifdef DEBUG
-    //SerialBT.print(F("Error: "));
-    //SerialBT.println(error);
-
-    if (i < ERROR_SIZE) {
-      errosValues[i] = error;
-      i++;
-    }
-#endif
     if (analogRead(PIN_MARKER_SENSOR) < 2000) {
       return true;
     }
