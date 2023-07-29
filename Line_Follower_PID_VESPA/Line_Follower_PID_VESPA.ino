@@ -93,6 +93,8 @@ void setup() {
       printParameters();
     } else if (prefix == "end") {
       break;
+    } else {
+      SerialBT.println("This command doesn't exists!");
     }
   }
 
