@@ -83,7 +83,7 @@ void setup() {
       Kp = getNumber(btMessage, 1);
       Ki = getNumber(btMessage, 2);
       Kd = getNumber(btMessage, 3);
-    } else if (prefix == "vel") {
+    } else if (prefix == "spe") {
       maxSpeed = getNumber(btMessage, 1);
     } else if (prefix == "tim") {
       startMakerChecker = getNumber(btMessage, 1);
