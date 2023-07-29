@@ -42,9 +42,11 @@ void loop() {
 }
 
 void auxSensorTest() {
-  delay(250);
+  Serial.print("D: ");
   Serial.println(digitalRead(PIN_MARKER_SENSOR));
+  Serial.print("\tA: ");
   Serial.println(analogRead(PIN_MARKER_SENSOR));
+  delay(250);
 }
 
 void mainSensorTest() {
