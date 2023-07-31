@@ -44,6 +44,8 @@ unsigned long initialTime;
 // Limit value of the margin of error
 int marginError = 20;
 
+bool firstRun = true;
+
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
 
@@ -66,10 +68,14 @@ void setup() {
   pinMode(PIN_LED, OUTPUT);
 
 #ifdef DEBUG
-  Serial.begin(115200);
-  delay(100);
+  if (firstRun) {
+    Serial.begin(115200);
+    delay(100);
 
-  SerialBT.begin(BT_NAME);  // Bluetooth device name
+    SerialBT.begin(BT_NAME);  // Bluetooth device name
+    firstRun = false;
+  }
+
   SerialBT.println("Start BT communication");
 
   String btMessage;
