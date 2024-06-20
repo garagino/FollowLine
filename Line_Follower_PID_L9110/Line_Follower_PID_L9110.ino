@@ -19,11 +19,16 @@
 BluetoothSerial SerialBT;  // Bluetooth Serial instance
 #endif
 
-#include <RoboCore_Vespa.h>  // Library for the Vespa microcontroller
+#include <Arduino.h>      // Changed
 #include <QTRSensors.h>      // Library for the QTR-8A or the QTR-8RC
 
-VespaMotors motor;  // Vespa Motor Object
 QTRSensors qtr;     // QTR Sensor
+
+// Define the motor control pins - Changed
+const uint8_t PIN_MOTOR_LEFT_FORWARD = 33;
+const uint8_t PIN_MOTOR_LEFT_BACKWARD = 25;
+const uint8_t PIN_MOTOR_RIGHT_FORWARD = 26;
+const uint8_t PIN_MOTOR_RIGHT_BACKWARD = 27;
 
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
@@ -60,6 +65,12 @@ const bool LINE_BLACK = false;
 //-------------------------------------------------
 
 void setup() {
+  // Changed
+  pinMode(PIN_MOTOR_LEFT_FORWARD, OUTPUT);
+  pinMode(PIN_MOTOR_LEFT_BACKWARD, OUTPUT);
+  pinMode(PIN_MOTOR_RIGHT_FORWARD, OUTPUT);
+  pinMode(PIN_MOTOR_RIGHT_BACKWARD, OUTPUT);
+
   qtr.setTypeRC();  // For QTR-8RC      Sensor pins:
   qtr.setSensorPins((const uint8_t[]){ 21, 19, 5, 16, 22, 23, 18, 17 }, SENSOR_COUNT);
 
@@ -158,7 +169,7 @@ void loop() {
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
-    motor.stop();
+     stopMotors();      // Changed
 #ifdef DEBUG
     SerialBT.print(">> Timelapse: ");
     SerialBT.print(millis() - initialTime);
@@ -166,9 +177,9 @@ void loop() {
 #endif
     setup();
   } else if (error >= -marginError && error <= marginError) {  // If the error is within the MARGIN_ERROR, move on
-    motor.turn(maxSpeed, maxSpeed);
+    moveMotors(maxSpeed, maxSpeed);  // Changed
   } else {  // If the error is outside the error range, continue doing PID
-    motor.turn(lSpeed, rSpeed);
+    moveMotors(lSpeed, rSpeed);      // Changed
   }
 }
 
@@ -194,6 +205,42 @@ bool markerChecker() {
   }
 
   return false;
+}
+
+/**
+  Move the motors with the specified speeds.
+
+  @param `leftSpeed` Speed of the left motor
+  @param `rightSpeed` Speed of the right motor
+  - Changed
+*/
+void moveMotors(int leftSpeed, int rightSpeed) {
+  if (leftSpeed > 0) {
+    analogWrite(PIN_MOTOR_LEFT_FORWARD, leftSpeed);
+    analogWrite(PIN_MOTOR_LEFT_BACKWARD, 0);
+  } else {
+    analogWrite(PIN_MOTOR_LEFT_FORWARD, 0);
+    analogWrite(PIN_MOTOR_LEFT_BACKWARD, -leftSpeed);
+  }
+
+  if (rightSpeed > 0) {
+    analogWrite(PIN_MOTOR_RIGHT_FORWARD, rightSpeed);
+    analogWrite(PIN_MOTOR_RIGHT_BACKWARD, 0);
+  } else {
+    analogWrite(PIN_MOTOR_RIGHT_FORWARD, 0);
+    analogWrite(PIN_MOTOR_RIGHT_BACKWARD, -rightSpeed);
+  }
+}
+
+/**
+  Stop the motors.
+  - Changed
+*/
+void stopMotors() {
+  analogWrite(PIN_MOTOR_LEFT_FORWARD, 0);
+  analogWrite(PIN_MOTOR_LEFT_BACKWARD, 0);
+  analogWrite(PIN_MOTOR_RIGHT_FORWARD, 0);
+  analogWrite(PIN_MOTOR_RIGHT_BACKWARD, 0);
 }
 
 #ifdef DEBUG
