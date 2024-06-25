@@ -54,9 +54,12 @@ float Ki = 0.0001;
 float Kd = 3.5;
 
 int maxSpeed = 100;
+int integralLimit = 200;
 int lSpeed, rSpeed;
 
 const bool LINE_BLACK = false;
+
+bool limiter = false;
 //-------------------------------------------------
 
 void setup() {
@@ -99,6 +102,14 @@ void setup() {
       printParameters();
     } else if (prefix == "end") {
       break;
+    } else if (prefix == "lim"){
+      if ( limiter == false){
+        limiter = true;
+        SerialBT.println("Limiter ativado!");
+      } else{
+        limiter = false;
+        SerialBT.println("Limiter desativado!");
+      }
     } else {
       SerialBT.println("This command doesn't exists!");
     }
@@ -146,6 +157,9 @@ void loop() {
   // Calculate PID
   p = error;
   i = i + error;
+  if (limiter == true){
+    i = constrain(i, -integralLimit, integralLimit); // Limita o valor do integral
+  }
   d = error - lastError;
   pid = (Kp * p) + (Ki * i) + (Kd * d);
   lastError = error;
@@ -160,7 +174,7 @@ void loop() {
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
     motor.stop();
 #ifdef DEBUG
-    SerialBT.print(">> Timelapse: ");
+    SerialBT.print(">> Timelapse: "); 
     SerialBT.print(millis() - initialTime);
     SerialBT.println(" seconds");
 #endif
@@ -279,6 +293,9 @@ void printParameters() {
 
   SerialBT.print(">> Margin Error: ");
   SerialBT.println(marginError);
+
+  SerialBT.print(">> Limitador: ");
+  SerialBT.println(limiter);
 }
 
 #endif
