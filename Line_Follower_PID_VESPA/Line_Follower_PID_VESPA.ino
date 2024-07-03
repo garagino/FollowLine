@@ -7,7 +7,7 @@
 ****************************************************************/
 
 #define DEBUG
-#define BT_NAME "I forgot to set a name"
+#define BT_NAME "I forgot to set a name - debug"
 // Names: Mutuca | Motoneta | Van Dyne
 
 #ifdef DEBUG
@@ -28,7 +28,8 @@ QTRSensors qtr;     // QTR Sensor
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
 const uint8_t PIN_LED = 15;
-const uint8_t PIN_MARKER_SENSOR = 36;
+const uint8_t PIN_MARKER_SENSOR_DIR = 36; // right sensor (stop)
+const uint8_t PIN_MARKER_SENSOR_ESQ = 39; // left sensor (count)
 
 //Setup of the module of sensors
 const uint8_t SENSOR_COUNT = 8;       // The number of sensors, which should match the length of the pins array
@@ -37,9 +38,13 @@ uint16_t sensorValues[SENSOR_COUNT];  // An array in which to store the calibrat
 // Maximum line position, considering the amount of sensors.
 const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 
-//Marker sensor variables
+//Right Marker sensor variables
 unsigned long startMakerChecker = 39500L;
 unsigned long initialTime;
+
+// Left Marker sensor variables
+int contadorSensorEsq = 0;
+boolean semaphoreSensorEsq = false;
 
 // Limit value of the margin of error
 int marginError = 20;
@@ -67,7 +72,8 @@ void setup() {
   qtr.setSensorPins((const uint8_t[]){ 21, 19, 5, 16, 22, 23, 18, 17 }, SENSOR_COUNT);
 
   pinMode(PIN_BUTTON, INPUT);
-  pinMode(PIN_MARKER_SENSOR, INPUT);
+  pinMode(PIN_MARKER_SENSOR_DIR, INPUT);
+  pinMode(PIN_MARKER_SENSOR_ESQ, INPUT);
   pinMode(PIN_LED, OUTPUT);
 
 #ifdef DEBUG
@@ -144,8 +150,8 @@ void setup() {
   }
   SerialBT.println();
 #endif
-
   delay(2000);  // Start loop after 2 seconds
+  contadorSensorEsq = 0;
   initialTime = millis();
 }
 
@@ -171,12 +177,19 @@ void loop() {
   lSpeed = constrain(lSpeed, -maxSpeed, maxSpeed);
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
+  countTurn(); // contar sensor esquerdo
+
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
+    SerialBT.println("Parei o robo");
     motor.stop();
+  
 #ifdef DEBUG
     SerialBT.print(">> Timelapse: "); 
     SerialBT.print(millis() - initialTime);
     SerialBT.println(" seconds");
+
+    SerialBT.print(">> Contador de Sensor Esquerdo: ");
+    SerialBT.println(contadorSensorEsq);
 #endif
     setup();
   } else if (error >= -marginError && error <= marginError) {  // If the error is within the MARGIN_ERROR, move on
@@ -201,14 +214,27 @@ int readSensors() {
 */
 bool markerChecker() {
   static int i = 0;
-  if (startMakerChecker < millis() - initialTime) {
-    if (analogRead(PIN_MARKER_SENSOR) < 2000) {
+  if (startMakerChecker < millis() - initialTime) {      
+    if (analogRead(PIN_MARKER_SENSOR_DIR) < 2000) {
       return true;
     }
   }
 
   return false;
 }
+
+void countTurn() {
+  if (analogRead(PIN_MARKER_SENSOR_ESQ) < 2000) {
+    if (semaphoreSensorEsq == true){
+      contadorSensorEsq++;
+      semaphoreSensorEsq = false;
+    }
+  }
+  else{
+    semaphoreSensorEsq = true;
+  }
+}
+
 
 #ifdef DEBUG
 
@@ -296,6 +322,9 @@ void printParameters() {
 
   SerialBT.print(">> Limitador: ");
   SerialBT.println(limiter);
+
+  SerialBT.print(">> Contador de Sensor Esquerdo: ");
+  SerialBT.println(contadorSensorEsq);
 }
 
 #endif
