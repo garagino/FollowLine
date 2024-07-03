@@ -7,7 +7,7 @@
 ****************************************************************/
 
 #define DEBUG
-#define BT_NAME "I forgot to set a name - debug"
+#define BT_NAME "I forgot to set a name"
 // Names: Mutuca | Motoneta | Van Dyne
 
 #ifdef DEBUG
@@ -41,6 +41,9 @@ const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 //Right Marker sensor variables
 unsigned long startMakerChecker = 39500L;
 unsigned long initialTime;
+int contadorSensorDir = 0;
+boolean semaphoreSensorDir = false;
+int stopMarker = 0;
 
 // Left Marker sensor variables
 int contadorSensorEsq = 0;
@@ -80,6 +83,8 @@ void setup() {
   if (firstRun) {
     Serial.begin(115200);
     delay(100);
+    contadorSensorDir = 0;
+    contadorSensorEsq = 0;
 
     SerialBT.begin(BT_NAME);  // Bluetooth device name
     firstRun = false;
@@ -108,6 +113,8 @@ void setup() {
       printParameters();
     } else if (prefix == "end") {
       break;
+    } else if (prefix == "sto") {
+      stopMarker = getNumber(btMessage, 1);
     } else if (prefix == "lim"){
       if ( limiter == false){
         limiter = true;
@@ -152,6 +159,7 @@ void setup() {
 #endif
   delay(2000);  // Start loop after 2 seconds
   contadorSensorEsq = 0;
+  contadorSensorDir = 0;
   initialTime = millis();
 }
 
@@ -177,7 +185,8 @@ void loop() {
   lSpeed = constrain(lSpeed, -maxSpeed, maxSpeed);
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
-  countTurn(); // contar sensor esquerdo
+  countTurnLeft(); // contar sensor esquerdo
+  countTurnRight(); // contar sensor direito
 
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
     SerialBT.println("Parei o robo");
@@ -190,6 +199,9 @@ void loop() {
 
     SerialBT.print(">> Contador de Sensor Esquerdo: ");
     SerialBT.println(contadorSensorEsq);
+
+    SerialBT.print(">> Contador de Sensor Direito: ");
+    SerialBT.println(contadorSensorDir);
 #endif
     setup();
   } else if (error >= -marginError && error <= marginError) {  // If the error is within the MARGIN_ERROR, move on
@@ -223,10 +235,12 @@ bool markerChecker() {
   return false;
 }
 
-void countTurn() {
+void countTurnLeft() {
   if (analogRead(PIN_MARKER_SENSOR_ESQ) < 2000) {
     if (semaphoreSensorEsq == true){
       contadorSensorEsq++;
+      SerialBT.print("Contei algo na esquerda: ");
+      SerialBT.println(contadorSensorEsq);
       semaphoreSensorEsq = false;
     }
   }
@@ -234,6 +248,28 @@ void countTurn() {
     semaphoreSensorEsq = true;
   }
 }
+
+void countTurnRight() {
+  if (analogRead(PIN_MARKER_SENSOR_DIR) < 2000) {
+    if (semaphoreSensorDir == true){
+      contadorSensorDir++;
+      SerialBT.print("Contei algo na direita: ");
+      SerialBT.println(contadorSensorDir);
+      if (stopMarker != 0){
+        if (contadorSensorDir >= stopMarker){
+          SerialBT.println("Parei o robo");
+          motor.stop();
+          setup();
+        }
+      }
+      semaphoreSensorDir = false;
+    }
+  }
+  else{
+    semaphoreSensorDir = true;
+  }
+}
+
 
 
 #ifdef DEBUG
@@ -325,6 +361,12 @@ void printParameters() {
 
   SerialBT.print(">> Contador de Sensor Esquerdo: ");
   SerialBT.println(contadorSensorEsq);
+
+  SerialBT.print(">> Contador de Sensor Direito: ");
+  SerialBT.println(contadorSensorDir);
+
+  SerialBT.print(">> Robô vai parar no: ");
+  SerialBT.println(stopMarker);
 }
 
 #endif
