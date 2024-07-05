@@ -29,7 +29,7 @@ QTRSensors qtr;     // QTR Sensor
 // Set button and led pins
 const uint8_t PIN_BUTTON = 35;
 const uint8_t PIN_LED = 15;
-const uint8_t PIN_MARKER_SENSOR = z 5;
+const uint8_t PIN_MARKER_SENSOR = 25;
 
 //Setup of the module of sensors
 const uint8_t SENSOR_COUNT = 8;       // The number of sensors, which should match the length of the pins array
@@ -70,33 +70,31 @@ bool limiter = true;
 
 //------------------Encoder-------------------
 
-float distanceLeftMotor;
-float distanceRightMotor;
-float distance = 565;
-float distanceAverage;
-float multEncoder;
-int CHANGE_PIN_MARKER_SENSOR_ESQ;
-int contadorCurva;
-int contadorCurvaResto;
-int freio = -90;
+float distanceLeftMotor;          //Calculates the distance of te left motor in mm
+float distanceRightMotor;         //Calculates the distance of te Right motor in mm
+float distanceAverage;            //Calculates the average distance in mm
+float multEncoder;                
+
+float maxDistance = 565;              //Maximum distance 
 
 
 
+int timeDeltaCurve = 0;            // Controls the amount of times the curve interrupt is activated
+int curveMarkCount;                // Counts the amount of times the robot has passed by a Curve marker
+int curveCount;                    // Counts the amount of times the robot has passed by the first marker of a curve
+int endLineCount;                  // Counts the amount of times the robot has passed by a End marker
 
 
-// Todas as portas da esp32 suportam interrupt, estou chutando que essas portas vão funcionar
-int encoderLeftPin1 = 25; //Encoder Output 'A' must connected with intreput pin of arduino.
-int encoderLeftPin2 = 26; //Encoder Output 'B' must connected with intreput pin of arduino.
+int timeDeltaBreaker = 0;               // breaking time  
+int timeBreaker = 100;               // breaking time  
+int breaker = 90;                    // breaker strengh
 
-int encoderRightPin1 = 33; //Encoder Output 'A' must connected with intreput pin of arduino.
-int encoderRightPin2 = 32; //Encoder Output 'B' must connected with intreput pin of arduino.
+int encoderLeftPin = 32; //Encoder Output 'A' must connected with intreput pin of arduino.
+int encoderRightPin = 33; //Encoder Output 'B' must connected with intreput pin of arduino.
 
+int  encoderValueLeft = 0;
+int  encoderValueRight = 0;
 
-volatile int lastEncodedLeft = 0; // Here updated value of encoder store.
-volatile int lastEncodedRight = 0; // Here updated value of encoder store.
-
-volatile long encoderValueLeft = 0; // Raw encoder value
-volatile long encoderValueRight = 0; // Raw encoder value
 
 //-------------------------------------------------
 
@@ -110,29 +108,21 @@ void setup() {
 
   multEncoder = 0.0526;
 
-
-  
-  pinMode(encoderLeftPin1, INPUT_PULLUP); 
-  pinMode(encoderLeftPin2, INPUT_PULLUP);
-
-  pinMode(encoderRightPin1, INPUT_PULLUP); 
-  pinMode(encoderRightPin2, INPUT_PULLUP);
+ 
+  pinMode(encoderLeftPin, INPUT_PULLUP); 
+  pinMode(encoderRightPin, INPUT_PULLUP); 
+  digitalWrite(encoderLeftPin, HIGH); //turn pullup resistor on
+  digitalWrite(encoderRightPin, HIGH); //turn pullup resistor on
 
 
 
-  digitalWrite(encoderLeftPin1, HIGH); //turn pullup resistor on
-  digitalWrite(encoderLeftPin2, HIGH); //turn pullup resistor on
+  attachInterrupt(encoderLeftPin, updateEncoderLeft, CHANGE);
 
-  digitalWrite(encoderRightPin1, HIGH); //turn pullup resistor on
-  digitalWrite(encoderRightPin2, HIGH); //turn pullup resistor on
+  attachInterrupt(encoderRightPin, updateEncoderRight, CHANGE);
 
+  attachInterrupt(PIN_MARKER_SENSOR, curveBreaker, HIGH);
 
-
-  attachInterrupt(32, updateEncoderLeft, CHANGE);
-
-  attachInterrupt(33, updateEncoderRight, CHANGE);
-
-  attachInterrupt(PIN_MARKER_SENSOR, curveBreaker, RISING);
+  // attachInterrupt(PIN_MARKER_SENSOR, countEndLine, HIGH);
 
 
 #ifdef DEBUG
@@ -170,11 +160,13 @@ void setup() {
     } else if (prefix == "err") {
       marginError = getNumber(btMessage, 1);
     } else if (prefix == "dis") {
-      distance = getNumber(btMessage, 1);
+      maxDistance = getNumber(btMessage, 1);
     } else if (prefix == "mul") {
       multEncoder = getNumber(btMessage, 1);
-    } else if (prefix == "fre") {
-      freio = getNumber(btMessage, 1);
+    } else if (prefix == "bre") {
+      breaker = getNumber(btMessage, 1);
+    } else if (prefix == "tbe") {
+      timeBreaker = getNumber(btMessage, 1);
     } else if (prefix == "pri") {
       printParameters();
     } else if (prefix == "end") {
@@ -259,13 +251,21 @@ void loop() {
 
   lSpeed = constrain(lSpeed, -maxSpeed, maxSpeed);
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
-  if (contadorCurvaResto == 1){
 
-    lSpeed = freio;
-    // rSpeed = freio;
-    delay(100);
-    contadorCurvaResto = 0;
-    Serial.println(rSpeed);
+  curveCount = curveMarkCount % 2;
+  
+
+
+  if (curveCount == 1){
+    timeDeltaBreaker = millis() - 1;
+    Serial.println("teste2");
+    while((millis() - timeDeltaBreaker) < timeBreaker){
+      pid = 0.0;
+      motor.backward(breaker);
+      curveCount = 0;
+      curveMarkCount++;
+      Serial.println(timeDeltaBreaker);
+    }
   }
 
 
@@ -317,7 +317,7 @@ bool markerChecker() {
     return true;
     // }
   }
-  if (distanceAverage > distance) {
+  if (distanceAverage > maxDistance) {
     return true;
   }
 
@@ -414,15 +414,15 @@ void printParameters() {
   SerialBT.print(">> turnSpeed: ");
   SerialBT.println(turnSpeed);
 
-  SerialBT.print(">> Distance: ");
-  SerialBT.println(distance);
+  SerialBT.print(">> Max Distance: ");
+  SerialBT.println(maxDistance);
 
   SerialBT.print(">> Mult Encoder: ");
   SerialBT.println(multEncoder);
 
 
-  SerialBT.print(">> freio: ");
-  SerialBT.println(freio);
+  SerialBT.print(">> breaker: ");
+  SerialBT.println(breaker);
 
 
 }
@@ -444,7 +444,14 @@ void updateEncoderRight()
   }
 
 void curveBreaker (){
-  SerialBT.println("Contei uma curva");
-  contadorCurva++;
   
+  if (millis() - timeDeltaCurve > 100) {
+    Serial.println("teste");
+    timeDeltaCurve = millis();
+    curveMarkCount++;
+  }
+}
+
+void countEndLine(){
+  endLineCount++;
 }
