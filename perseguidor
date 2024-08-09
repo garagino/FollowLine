@@ -2,7 +2,7 @@
 * Perseguidor
 * CESAR School
 * 
-* Perseguidor with Start and Stop
+* Perseguidor with Start and Stop via Bluetooth
 * PID with the microcontroller Vespa 
 * from RoboCore and the Pololu's QTR-8RC sensor
 ****************************************************************/
