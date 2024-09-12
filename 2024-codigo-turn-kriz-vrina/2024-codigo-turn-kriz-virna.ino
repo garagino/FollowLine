@@ -5,10 +5,10 @@
 * Line Follower PID with the microcontroller Vespa 
 * from RoboCore and the Pololu's QTR-8RC sensor
 ****************************************************************/
-
+// Atualização do dia 21 de setembro de 2024. Código limpo, o turnSpeed virou forwardSpeed por motivos de coesão e coerência com o código. Prefixo 'for'.
 #define DEBUG
-#define BT_NAME "change-name-virna-kriz"
-// Names: Mutuca | Motoneta | Van Dyne
+#define BT_NAME "I forgot to set a name"
+// Names: Kriz | Vin-a
 
 
 #ifdef DEBUG
@@ -39,7 +39,7 @@ uint16_t sensorValues[SENSOR_COUNT];  // An array in which to store the calibrat
 const long MAX_POSITION = (SENSOR_COUNT - 1) * 1000;
 
 //Marker sensor variables
-unsigned long startMakerChecker = 35500L;
+unsigned long startMakerChecker = 39500L;
 unsigned long initialTime;
 
 // Limit value of the margin of error
@@ -50,47 +50,19 @@ bool firstRun = true;
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
 
-float Kp = 0.71;
+float Kp = 0.4;
 float Ki = 0.0001;
-float Kd = 4.3;
+float Kd = 3.55;
 
-int turnSpeed = 100;
-
-int maxSpeed = 100;
+// O turnSpeed virou forwardSpeed por motivos de coesão e coerência com o código. Prefixo 'for'.
+int forwardSpeed = 56;
+int maxSpeed = 75;
 int integralLimit = 200;
 int lSpeed, rSpeed;
 
 const bool LINE_BLACK = false;
 
 bool limiter = true;
-
-//------------------Encoder-------------------
-
-float distanceLeftMotor;
-float distanceRightMotor;
-float distance = 565;
-float distanceAverage;
-float multEncoder;
- 
-
-
-
-
-// Todas as portas da esp32 suportam interrupt, estou chutando que essas portas vão funcionar
-int encoderLeftPin1 = 25; //Encoder Output 'A' must connected with intreput pin of arduino.
-int encoderLeftPin2 = 26; //Encoder Output 'B' must connected with intreput pin of arduino.
-
-int encoderRightPin1 = 33; //Encoder Output 'A' must connected with intreput pin of arduino.
-int encoderRightPin2 = 32; //Encoder Output 'B' must connected with intreput pin of arduino.
-
-
-volatile int lastEncodedLeft = 0; // Here updated value of encoder store.
-volatile int lastEncodedRight = 0; // Here updated value of encoder store.
-
-volatile long encoderValueLeft = 0; // Raw encoder value
-volatile long encoderValueRight = 0; // Raw encoder value
-
-//-------------------------------------------------
 
 void setup() {
   qtr.setTypeRC();  // For QTR-8RC      Sensor pins:
@@ -99,33 +71,6 @@ void setup() {
   pinMode(PIN_BUTTON, INPUT);
   pinMode(PIN_MARKER_SENSOR, INPUT);
   pinMode(PIN_LED, OUTPUT);
-
-  multEncoder = 0.0526;
-
-
-  
-  pinMode(encoderLeftPin1, INPUT_PULLUP); 
-  pinMode(encoderLeftPin2, INPUT_PULLUP);
-
-  pinMode(encoderRightPin1, INPUT_PULLUP); 
-  pinMode(encoderRightPin2, INPUT_PULLUP);
-
-
-
-  digitalWrite(encoderLeftPin1, HIGH); //turn pullup resistor on
-  digitalWrite(encoderLeftPin2, HIGH); //turn pullup resistor on
-
-  digitalWrite(encoderRightPin1, HIGH); //turn pullup resistor on
-  digitalWrite(encoderRightPin2, HIGH); //turn pullup resistor on
-
-
-
-  //call updateEncoder() when any high/low changed seen
-  //on interrupt 0 (pin 2), or interrupt 1 (pin 3) 
-  attachInterrupt(0, updateEncoder, CHANGE);
-  attachInterrupt(1, updateEncoder, CHANGE);
-
-
 
 #ifdef DEBUG
   if (firstRun) {
@@ -145,26 +90,18 @@ void setup() {
     btMessage = receiveBtMessage();
     prefix = getPrefix(btMessage);
 
-    if (prefix == "turn") {
-      turnSpeed = getNumber(btMessage, 1);
-    }
-
     if (prefix == "pid") {
       Kp = getNumber(btMessage, 1);
       Ki = getNumber(btMessage, 2);
       Kd = getNumber(btMessage, 3);
     } else if (prefix == "spe") {
       maxSpeed = getNumber(btMessage, 1);
-    } else if (prefix == "turn") {
-      turnSpeed = getNumber(btMessage, 1);
+    } else if (prefix == "for") {
+      forwardSpeed = getNumber(btMessage, 1);
     } else if (prefix == "tim") {
       startMakerChecker = getNumber(btMessage, 1);
     } else if (prefix == "err") {
       marginError = getNumber(btMessage, 1);
-    } else if (prefix == "dis") {
-      distance = getNumber(btMessage, 1);
-    } else if (prefix == "mul") {
-      multEncoder = getNumber(btMessage, 1);
     } else if (prefix == "pri") {
       printParameters();
     } else if (prefix == "end") {
@@ -192,19 +129,7 @@ void setup() {
   // Calibration
   digitalWrite(PIN_LED, HIGH);
   while (digitalRead(PIN_BUTTON) == HIGH) {  // Calibrates until the button is pressed
-    Serial.print("Left  ");
-    Serial.print(distanceLeftMotor);
-    Serial.print("  ");
-    Serial.print("Right  ");
-    Serial.println(distanceRightMotor);
-
- 
-
     qtr.calibrate();
-
-    encoderValueLeft = 0;
-    encoderValueRight = 0;
-
   }
   digitalWrite(PIN_LED, LOW);
 
@@ -231,18 +156,7 @@ void setup() {
 void loop() {
   // readSensors() returns the line position between 0 and `MAX_POSITION`.
   // error is a re-map from -1000 to 1000 range.
-
-  Serial.print("Left  ");
-  Serial.print(distanceLeftMotor);
-  Serial.print("  ");
-  Serial.print("Right  ");
-  Serial.println(distanceRightMotor);
-
   error = map(readSensors(), 0, MAX_POSITION, -1000, 1000);
-
-
-
-
 
   // Calculate PID
   p = error;
@@ -261,20 +175,8 @@ void loop() {
   lSpeed = constrain(lSpeed, -maxSpeed, maxSpeed);
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
-
-  updateEncoder();
-
-
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
-    SerialBT.print("Left  ");
-    SerialBT.print(distanceLeftMotor);
-    SerialBT.print("  ");
-    SerialBT.print("Right  ");
-    SerialBT.println(distanceRightMotor);
     motor.stop();
-
-
-
 #ifdef DEBUG
     SerialBT.print(">> Timelapse: "); 
     SerialBT.print(millis() - initialTime);
@@ -282,7 +184,7 @@ void loop() {
 #endif
     setup();
   } else if (error >= -marginError && error <= marginError) {  // If the error is within the MARGIN_ERROR, move on
-    motor.turn(turnSpeed, turnSpeed);
+    motor.turn(forwardSpeed, forwardSpeed);
   } else {  // If the error is outside the error range, continue doing PID
     motor.turn(lSpeed, rSpeed);
   }
@@ -399,53 +301,8 @@ void printParameters() {
   SerialBT.print(">> Limitador: ");
   SerialBT.println(limiter);
 
-  SerialBT.print(">> turnSpeed: ");
-  SerialBT.println(turnSpeed);
-
-  SerialBT.print(">> Distance: ");
-  SerialBT.println(distance);
-  SerialBT.print(">> Mult Encoder: ");
-  SerialBT.println(multEncoder);
+  SerialBT.print(">> Forward Speed: ");
+  SerialBT.println(forwardSpeed);
 }
 
 #endif
-
-
-
-void updateEncoder(){
-
-  /*************************************************
-  circuferencia levando pi a 5 casas=
-  188.4954
-
-  Pontos por mm: 
-  72.27232070384741
-  
-
-
-
-  **************************************************/
-  int MSB = digitalRead(encoderLeftPin1); //MSB = most significant bit
-  int LSB = digitalRead(encoderLeftPin2); //LSB = least significant bit
-
-  int encoded = (MSB << 1) |LSB; //converting thex 2 pin value to single number
-  int sum  = (lastEncodedLeft << 2) | encoded; //adding it to the previous encoded value
-
-  if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValueLeft --;
-  if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValueLeft ++;
-
-  lastEncodedLeft = encoded; //store this value for next time
-
-  MSB = digitalRead(encoderRightPin1); //MSB = most significant bit
-  LSB = digitalRead(encoderRightPin2); //LSB = least significant bit
-
-  encoded = (MSB << 1) |LSB; //converting thex 2 pin value to single number
-  sum  = (lastEncodedRight << 2) | encoded; //adding it to the previous encoded value
-
-  if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValueRight --;
-  if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValueRight ++;
-
-  lastEncodedRight = encoded; //store this value for next time
-
-
-}
