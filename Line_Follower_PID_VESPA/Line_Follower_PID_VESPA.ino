@@ -200,9 +200,11 @@ int readSensors() {
   @return `true` if the end line was detected.
 */
 bool markerChecker() {
-  static int i = 0;
   if (startMakerChecker < millis() - initialTime) {
     if (analogRead(PIN_MARKER_SENSOR) < 2000) {
+      for (int i = 0; i < 10000; i++){ // se deseja aumentar um pouco o tempo da inércia do robô parar até ele de fato parar de andar abaixe o tamanho do loop.
+        motor.turn(-50, -50);  // esse for faz com que o robô passe um certo (pequeno) tempo indo para trás, fazendo uma parada suave e bonita.
+      }
       return true;
     }
   }
