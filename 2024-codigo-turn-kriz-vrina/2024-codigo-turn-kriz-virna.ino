@@ -50,9 +50,9 @@ bool firstRun = true;
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
 
-float Kp = 0.4;
+float Kp = 0.412;
 float Ki = 0.0001;
-float Kd = 3.55;
+float Kd = 3.485;
 
 // O turnSpeed virou forwardSpeed por motivos de coesão e coerência com o código. Prefixo 'for'.
 int forwardSpeed = 56;
@@ -207,7 +207,7 @@ bool markerChecker() {
   if (startMakerChecker < millis() - initialTime) {
     if (analogRead(PIN_MARKER_SENSOR) < 2000) {
       for (int i = 0; i < 10000; i++){ // se deseja aumentar um pouco o tempo da inércia do robô parar até ele de fato parar de andar abaixe o tamanho do loop.
-        motor.turn(-100, -100);  // esse for faz com que o robô passe um certo (pequeno) tempo indo para trás, fazendo uma parada suave e bonita.
+        motor.turn(-50, -50);  // esse for faz com que o robô passe um certo (pequeno) tempo indo para trás, fazendo uma parada suave e bonita.
       }
       return true;
     }
