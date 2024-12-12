@@ -353,15 +353,13 @@ String getElement(String data, int index) {
 void updateEncoder(){
 
   /*************************************************
-  30 ticks == 100 mm
-  
-  pontos por volta: 
-  301
-    **************************************************/
-  //Converting interruptions to mm: 188.4954 / 0,6283
+  circuferencia levando pi a 5 casas=
+  188.4954
 
-  float conv; 
-  conv = 188.4954/0.6283;
+  Pontos por mm: 
+  72.27232070384741
+
+  **************************************************/
   int MSB = digitalRead(encoderLeftPin1); //MSB = most significant bit
   int LSB = digitalRead(encoderLeftPin2); //LSB = least significant bit
 
@@ -384,10 +382,7 @@ void updateEncoder(){
 
   lastEncodedRight = encoded; //store this value for next time
 
-  distanceLeftMotor = encoderValueLeft*3.33;
-  distanceRightMotor = encoderValueRight*3.33;
 }
-
 void printParameters() {
   SerialBT.println("Configured parameters:");
   SerialBT.print(">> P: ");
