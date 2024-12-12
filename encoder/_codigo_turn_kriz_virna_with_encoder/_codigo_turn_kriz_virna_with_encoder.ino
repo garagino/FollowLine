@@ -7,7 +7,7 @@
 ****************************************************************/
 // Atualização do dia 21 de setembro de 2024. Código limpo, o turnSpeed virou forwardSpeed por motivos de coesão e coerência com o código. Prefixo 'for'.
 #define DEBUG
-#define BT_NAME "I forgot to set a name"
+#define BT_NAME "N1"
 // Names: Kriz | Vin-a
 
 
@@ -15,7 +15,7 @@
 #include "BluetoothSerial.h"
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
-#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#error Bluetooth is not enabled! Please run make menuconfig to and enable it
 #endif
 BluetoothSerial SerialBT;  // Bluetooth Serial instance
 #endif
@@ -66,8 +66,7 @@ bool limiter = true;
 
 //------------------Encoder-------------------
 
-float distanceLeftMotor;
-float distanceRightMotor;
+float distanceMotor;
 float distance = 565;
 float distanceAverage;
 float multEncoder;
@@ -82,8 +81,7 @@ int encoderRightPin2 = 32; //Encoder Output 'B' must connected with intreput pin
 volatile int lastEncodedLeft = 0; // Here updated value of encoder store.
 volatile int lastEncodedRight = 0; // Here updated value of encoder store.
 
-volatile long encoderValueLeft = 0; // Raw encoder value
-volatile long encoderValueRight = 0; // Raw encoder value
+volatile long encoderValue = 0; // Raw encoder value
 
 //-------------------------------------------------
 
@@ -115,8 +113,8 @@ void setup() {
 
   //call updateEncoder() when any high/low changed seen
   //on interrupt 0 (pin 2), or interrupt 1 (pin 3) 
-  attachInterrupt(0, updateEncoder, CHANGE);
-  attachInterrupt(1, updateEncoder, CHANGE);
+  attachInterrupt(encoderLeftPin1, updateEncoder, CHANGE);
+  attachInterrupt(encoderRightPin1, updateEncoder, CHANGE);
 
 //-------------------------------------------------
 
@@ -179,8 +177,7 @@ void setup() {
   while (digitalRead(PIN_BUTTON) == HIGH) {  // Calibrates until the button is pressed
     qtr.calibrate();
     //------------------Encoder-------------------
-    encoderValueLeft = 0;
-    encoderValueRight = 0;
+    encoderValue = 0;
     //-------------------------------------
   }
   digitalWrite(PIN_LED, LOW);
@@ -207,15 +204,12 @@ void setup() {
 
 void loop() {
   //------------------Encoder-------------------
-  Serial.print("Left  ");
-  Serial.print(distanceLeftMotor);
-  Serial.print("  ");
-  Serial.print("Right  ");
-  Serial.println(distanceRightMotor);
+  Serial.print("Encoder  ");
+  Serial.println(distanceMotor);
   //--------------------------------------------
 
 
-  // readSensors() returns the line position between 0 and `MAX_POSITION`.
+  // readSensors() returns the line position between 0 and MAX_POSITION.
   // error is a re-map from -1000 to 1000 range.
   error = map(readSensors(), 0, MAX_POSITION, -1000, 1000);
 
@@ -237,10 +231,9 @@ void loop() {
   rSpeed = constrain(rSpeed, -maxSpeed, maxSpeed);
 
 //------------------Encoder-------------------
-  distanceLeftMotor = encoderValueLeft*multEncoder;
-  distanceRightMotor = encoderValueRight*multEncoder;
+  distanceMotor = encoderValue*multEncoder;
 
-  distanceAverage = (distanceLeftMotor/2.0) + (distanceRightMotor/2.0);
+  distanceAverage = (distanceMotor/2.0);
 //---------------------------------------------
 
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
@@ -269,7 +262,7 @@ int readSensors() {
 /**
   Verifies if there is a end line after a set time
 
-  @return `true` if the end line was detected.
+  @return true if the end line was detected.
 */
 bool markerChecker() {
   if (startMakerChecker < millis() - initialTime) {
@@ -290,7 +283,7 @@ bool markerChecker() {
   Returns all stream of data sent over bluetooth until the
   button is pressed.
 
-  @return `String` with the message sent by the bluetooth device
+  @return String with the message sent by the bluetooth device
 */
 String receiveBtMessage() {
   String message;
@@ -321,12 +314,12 @@ double getNumber(String data, int index) {
 }
 
 /**
-  Returns a sub-string in the `String` data, in the index
+  Returns a sub-string in the String data, in the index
   position.
 
-  @param `data` String with the message
-  @param `index` Position of the element to be returned
-  @return `String` sub-string in the indicated position. If there is
+  @param data String with the message
+  @param index Position of the element to be returned
+  @return String sub-string in the indicated position. If there is
   no value at this position, it returns empty string.
 */
 String getElement(String data, int index) {
@@ -352,37 +345,10 @@ String getElement(String data, int index) {
 
 void updateEncoder(){
 
-  /*************************************************
-  circuferencia levando pi a 5 casas=
-  188.4954
-
-  Pontos por mm: 
-  72.27232070384741
-
-  **************************************************/
-  int MSB = digitalRead(encoderLeftPin1); //MSB = most significant bit
-  int LSB = digitalRead(encoderLeftPin2); //LSB = least significant bit
-
-  int encoded = (MSB << 1) |LSB; //converting thex 2 pin value to single number
-  int sum  = (lastEncodedLeft << 2) | encoded; //adding it to the previous encoded value
-
-  if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValueLeft --;
-  if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValueLeft ++;
-
-  lastEncodedLeft = encoded; //store this value for next time
-
-  MSB = digitalRead(encoderRightPin1); //MSB = most significant bit
-  LSB = digitalRead(encoderRightPin2); //LSB = least significant bit
-
-  encoded = (MSB << 1) |LSB; //converting thex 2 pin value to single number
-  sum  = (lastEncodedRight << 2) | encoded; //adding it to the previous encoded value
-
-  if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValueRight --;
-  if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValueRight ++;
-
-  lastEncodedRight = encoded; //store this value for next time
+  encoderValue ++;
 
 }
+
 void printParameters() {
   SerialBT.println("Configured parameters:");
   SerialBT.print(">> P: ");
