@@ -350,6 +350,44 @@ String getElement(String data, int index) {
   return data.substring(startIndex, endIndex);
 }
 
+void updateEncoder(){
+
+  /*************************************************
+  30 ticks == 100 mm
+  
+  pontos por volta: 
+  301
+    **************************************************/
+  //Converting interruptions to mm: 188.4954 / 0,6283
+
+  float conv; 
+  conv = 188.4954/0.6283;
+  int MSB = digitalRead(encoderLeftPin1); //MSB = most significant bit
+  int LSB = digitalRead(encoderLeftPin2); //LSB = least significant bit
+
+  int encoded = (MSB << 1) |LSB; //converting thex 2 pin value to single number
+  int sum  = (lastEncodedLeft << 2) | encoded; //adding it to the previous encoded value
+
+  if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValueLeft --;
+  if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValueLeft ++;
+
+  lastEncodedLeft = encoded; //store this value for next time
+
+  MSB = digitalRead(encoderRightPin1); //MSB = most significant bit
+  LSB = digitalRead(encoderRightPin2); //LSB = least significant bit
+
+  encoded = (MSB << 1) |LSB; //converting thex 2 pin value to single number
+  sum  = (lastEncodedRight << 2) | encoded; //adding it to the previous encoded value
+
+  if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValueRight --;
+  if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValueRight ++;
+
+  lastEncodedRight = encoded; //store this value for next time
+
+  distanceLeftMotor = encoderValueLeft*3.33;
+  distanceRightMotor = encoderValueRight*3.33;
+}
+
 void printParameters() {
   SerialBT.println("Configured parameters:");
   SerialBT.print(">> P: ");
