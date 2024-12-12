@@ -78,14 +78,9 @@ int encoderLeftPin2 = 26; //Encoder Output 'B' must connected with intreput pin 
 int encoderRightPin1 = 33; //Encoder Output 'A' must connected with intreput pin of arduino.
 int encoderRightPin2 = 32; //Encoder Output 'B' must connected with intreput pin of arduino.
 
-volatile int lastEncodedLeft = 0; // Here updated value of encoder store.
-volatile int lastEncodedRight = 0; // Here updated value of encoder store.
-
 volatile long encoderValue = 0; // Raw encoder value
 
 //-------------------------------------------------
-
-
 
 
 void setup() {
@@ -232,8 +227,11 @@ void loop() {
 
 //------------------Encoder-------------------
   distanceMotor = encoderValue*multEncoder;
-
   distanceAverage = (distanceMotor/2.0);
+  if (SerialBT.available()) {
+    SerialBT.println(distanceMotor);
+    SerialBT.read();
+  }
 //---------------------------------------------
 
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
