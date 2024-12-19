@@ -5,7 +5,7 @@
 * Line Follower PID with the microcontroller Vespa 
 * from RoboCore and the Pololu's QTR-8RC sensor
 ****************************************************************/
-// Atualização do dia 21 de setembro de 2024. Código limpo, o turnSpeed virou forwardSpeed por motivos de coesão e coerência com o código. Prefixo 'for'.
+// Atualização do dia 19 de dezembro de 2024. Código limpo, o turnSpeed virou forwardSpeed por motivos de coesão e coerência com o código. Prefixo 'for'.
 #define DEBUG
 #define BT_NAME "N1"
 // Names: Kriz | Vin-a
@@ -69,7 +69,7 @@ bool limiter = true;
 float distanceMotor;
 float distance = 565;
 float distanceAverage;
-float multEncoder;
+float multEncoder = 1;
 
 // Todas as portas da esp32 suportam interrupt, estou chutando que essas portas vão funcionar
 int encoderLeftPin1 = 25; //Encoder Output 'A' must connected with intreput pin of arduino.
@@ -79,6 +79,13 @@ int encoderRightPin1 = 33; //Encoder Output 'A' must connected with intreput pin
 int encoderRightPin2 = 32; //Encoder Output 'B' must connected with intreput pin of arduino.
 
 volatile long encoderValue = 0; // Raw encoder value
+
+int markersDistance[20];
+int markersSetupIndex = 0;
+int markersRacingIndex = 0;
+int breakingTime = 0;
+
+bool enableCount = true; 
 
 //-------------------------------------------------
 
@@ -92,8 +99,6 @@ void setup() {
   pinMode(PIN_LED, OUTPUT);
 
 //------------------Encoder-------------------
-  multEncoder = 0.0526;
-
   pinMode(encoderLeftPin1, INPUT_PULLUP); 
   pinMode(encoderLeftPin2, INPUT_PULLUP);
 
@@ -137,7 +142,10 @@ void setup() {
       Kd = getNumber(btMessage, 3);
     } else if (prefix == "spe") {
       maxSpeed = getNumber(btMessage, 1);
-    } else if (prefix == "for") {
+    } else if (prefix == "mrk"){
+        markersDistance[markersSetupIndex] = getNumber(btMessage, 1);
+        markersSetupIndex++;
+    }else if (prefix == "for") {
       forwardSpeed = getNumber(btMessage, 1);
     } else if (prefix == "tim") {
       startMakerChecker = getNumber(btMessage, 1);
@@ -232,6 +240,14 @@ void loop() {
     SerialBT.println(distanceMotor);
     SerialBT.read();
   }
+  if (markersDistance[markersRacingIndex] < distanceMotor && markersDistance[markersRacingIndex] != 0){ // checa se 
+    SerialBT.print(markersDistance[markersRacingIndex]);
+    enableCount = false;
+    breaker(1000, 50);
+    markersRacingIndex++;
+    enableCount = true;
+  }
+  
 //---------------------------------------------
 
   if (markerChecker()) {  // Count the markers and stop the robot when reach a certain number
@@ -345,6 +361,12 @@ void updateEncoder(){
 
   encoderValue ++;
 
+}
+void breaker(int MillisOnReverse, int strength){
+    breakingTime = millis();
+    while ((millis() - breakingTime) < MillisOnReverse){
+      motor.backward(strength);
+    }
 }
 
 void printParameters() {
