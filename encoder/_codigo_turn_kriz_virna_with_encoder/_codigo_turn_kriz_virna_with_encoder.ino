@@ -80,7 +80,7 @@ int encoderRightPin2 = 32; //Encoder Output 'B' must connected with intreput pin
 
 volatile long encoderValue = 0; // Raw encoder value
 
-int markersDistance[20];
+int markersDistance[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int markersSetupIndex = 0;
 int markersRacingIndex = 0;
 int breakingTime = 0;
