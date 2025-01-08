@@ -47,6 +47,16 @@ int marginError = 20;
 
 bool firstRun = true;
 
+
+//-----------------------Curve Sensor----------------------
+#define SENSOR_PIN 39   // Pino ADC para o sensor de linha (deve ser um pino analógico do ESP32)
+// int curveSensorValue = analogRead(SENSOR_PIN);
+int curveCount = 0;
+bool curveSensorWhite = false; 
+//---------------------------------------------------------
+
+
+
 //------------------PID Control-------------------
 float p = 0, i = 0, d = 0, pid = 0, error = 0, lastError = 0;
 
@@ -211,6 +221,21 @@ void loop() {
   Serial.println(distanceMotor);
   //--------------------------------------------
 
+  //----------------CurveSensor-----------------
+  
+  if (analogRead(SENSOR_PIN) < 3000)
+  {
+    if (curveSensorWhite == false)
+    {
+      curveCount++;
+    }
+    curveSensorWhite = true; 
+  }else
+  {
+    curveSensorWhite = false;
+  }
+
+  //--------------------------------------------
 
   // readSensors() returns the line position between 0 and MAX_POSITION.
   // error is a re-map from -1000 to 1000 range.
